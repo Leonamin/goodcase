@@ -28,7 +28,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-갤러리는 `http://localhost:5179`, `pnpm storybook`으로 실행하는 Storybook은 `http://localhost:6019`입니다. 저장·업로드 등 갤러리의 비동기 예제는 로컬 시뮬레이션입니다.
+`pnpm dev`는 `0.0.0.0:5179`에 바인딩합니다. 이 컴퓨터에서는 `http://localhost:5179`, 같은 네트워크의 다른 기기에서는 `http://<컴퓨터의 LAN IP>:5179`로 접속합니다. `pnpm storybook`으로 실행하는 Storybook은 `http://localhost:6019`입니다. 저장·업로드 등 갤러리의 비동기 예제는 로컬 시뮬레이션입니다.
 
 ```sh
 pnpm build

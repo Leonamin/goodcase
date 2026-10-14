@@ -8,7 +8,7 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "vite --host 127.0.0.1 --port 5179",
+    "dev": "vite --host 0.0.0.0 --port 5179",
     "build": "tsc -b && vite build",
     "build:skill": "node scripts/build-skill.mjs",
     "test:skill": "node --test scripts/build-skill.test.mjs",

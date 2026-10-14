@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import {
   Check,
   ChevronRight,
@@ -10,6 +10,14 @@ import {
   Search,
   X,
 } from "lucide-react";
+import {
+  Badge,
+  Button,
+  IconButton,
+  Link,
+  TextField,
+  Typography,
+} from "./components/basic";
 import { entries } from "./catalog";
 import { downloadSource, filesFor, sourceFiles } from "./catalog/source";
 import type { CatalogEntry } from "./catalog/types";
@@ -25,6 +33,16 @@ const groups = [
   { id: "basic", label: "기본 컴포넌트" },
   { id: "composed", label: "조합형 컴포넌트" },
 ];
+
+function shouldNavigate(event: MouseEvent<HTMLAnchorElement>) {
+  return (
+    event.button === 0 &&
+    !event.metaKey &&
+    !event.ctrlKey &&
+    !event.shiftKey &&
+    !event.altKey
+  );
+}
 
 function readLocation() {
   const query = new URLSearchParams(window.location.search);
@@ -152,33 +170,46 @@ export function App({
         role={isNavOpen ? "dialog" : undefined}
         aria-modal={isNavOpen ? true : undefined}
       >
-        <a
-          className="gallery-brand"
-          href="?component=button"
-          onClick={(event) => {
-            event.preventDefault();
-            navigate("button");
-          }}
-        >
-          <Layers size={23} strokeWidth={1.8} />
-          <span>
-            goodcase<span className="brand-version">v0.1</span>
-          </span>
-        </a>
-        <div className="sidebar-intro">
-          직접 써보고, 가져다 쓰는
-          <br />
-          나의 컴포넌트 라이브러리.
+        <div className="sidebar-heading">
+          <Link
+            className="gallery-brand"
+            href="?component=button"
+            onClick={(event) => {
+              if (!shouldNavigate(event)) return;
+              event.preventDefault();
+              navigate("button");
+            }}
+          >
+            <span className="brand-mark">
+              <Layers size={22} strokeWidth={1.8} aria-hidden />
+            </span>
+            <span>Goodcase UI</span>
+          </Link>
+          <IconButton
+            label="컴포넌트 목록 닫기"
+            className="sidebar-close"
+            onClick={() => setIsNavOpen(false)}
+          >
+            <X size={20} aria-hidden />
+          </IconButton>
         </div>
-        <label className="gallery-search">
-          <Search size={16} aria-hidden />
-          <input
-            aria-label="컴포넌트 검색"
-            placeholder="컴포넌트 검색"
+        <div className="sidebar-intro">
+          <Typography variant="caption">
+            직접 써보고, 가져다 쓰는
+            <br />
+            UI 참조 라이브러리
+          </Typography>
+          <Badge>v0.1</Badge>
+        </div>
+        <div className="gallery-search">
+          <Search size={17} aria-hidden />
+          <TextField
+            label="컴포넌트 검색"
+            placeholder="이름이나 기능으로 찾기"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
-        </label>
+        </div>
         <nav>
           {groups.map((group) => (
             <section className="nav-group" key={group.id}>
@@ -191,12 +222,13 @@ export function App({
               {visible
                 .filter((item) => item.category === group.id)
                 .map((item) => (
-                  <a
+                  <Link
                     className={`nav-item ${entry.id === item.id ? "is-current" : ""}`}
                     href={`?component=${item.id}`}
                     aria-current={entry.id === item.id ? "page" : undefined}
                     key={item.id}
                     onClick={(event) => {
+                      if (!shouldNavigate(event)) return;
                       event.preventDefault();
                       navigate(item.id);
                     }}
@@ -207,7 +239,7 @@ export function App({
                     ) : entry.id === item.id ? (
                       <ChevronRight size={14} />
                     ) : null}
-                  </a>
+                  </Link>
                 ))}
             </section>
           ))}
@@ -233,18 +265,25 @@ export function App({
       <main className="gallery-main" inert={isNavOpen}>
         <header className="gallery-topbar">
           <div className="topbar-path">
-            <button
-              className="gallery-icon-button mobile-nav-toggle"
-              aria-label={isNavOpen ? "목록 닫기" : "목록 열기"}
+            <IconButton
+              className="mobile-nav-toggle"
+              label={isNavOpen ? "목록 닫기" : "목록 열기"}
+              aria-expanded={isNavOpen}
               onClick={() => setIsNavOpen(!isNavOpen)}
             >
-              {isNavOpen ? <X size={18} /> : <MenuIcon size={18} />}
-            </button>
+              {isNavOpen ? (
+                <X size={20} aria-hidden />
+              ) : (
+                <MenuIcon size={20} aria-hidden />
+              )}
+            </IconButton>
             <span>라이브러리</span>
             <ChevronRight size={13} />
             <strong>{entry.name}</strong>
           </div>
-          <span className="topbar-note">React · TypeScript</span>
+          <span className="topbar-note">
+            <Badge>React · TypeScript</Badge>
+          </span>
         </header>
         <div className="gallery-content">
           <div className="component-heading">
@@ -253,15 +292,17 @@ export function App({
                 {groups.find((group) => group.id === entry.category)?.label}
               </div>
               <h1>{entry.name}</h1>
-              <p>{entry.summary}</p>
+              <Typography variant="body">{entry.summary}</Typography>
             </div>
-            <button
+            <Button
+              variant="secondary"
               className={`review-button ${isReviewed ? "is-reviewed" : ""}`}
+              aria-pressed={isReviewed}
               onClick={toggleReview}
             >
-              <Check size={16} />
+              <Check size={16} aria-hidden />
               {isReviewed ? "검토 완료" : "검토 표시"}
-            </button>
+            </Button>
           </div>
           <div
             className="gallery-tabs"
@@ -269,75 +310,83 @@ export function App({
             aria-label="컴포넌트 문서"
           >
             {tabs.map((tab) => (
-              <a
+              <Link
                 key={tab.id}
                 aria-current={activeTab === tab.id ? "page" : undefined}
                 href={`?component=${entry.id}&tab=${tab.id}`}
                 className={activeTab === tab.id ? "is-active" : ""}
                 onClick={(event) => {
+                  if (!shouldNavigate(event)) return;
                   event.preventDefault();
                   navigate(entry.id, tab.id);
                 }}
               >
                 {tab.label}
-              </a>
+              </Link>
             ))}
           </div>
           {activeTab === "preview" && (
             <>
-              <div className="preview-toolbar">
-                <div>
-                  <label>
-                    테마
-                    <select
-                      aria-label="테마"
-                      value={theme}
-                      onChange={(event) => setTheme(event.target.value)}
-                    >
-                      <option value="reference">기본 · Blue</option>
-                      <option value="forest">변형 · Forest</option>
-                    </select>
-                  </label>
-                  <label>
-                    색상 모드
-                    <select
-                      aria-label="색상 모드"
-                      value={colorMode}
-                      onChange={(event) => setColorMode(event.target.value)}
-                    >
-                      <option value="light">라이트</option>
-                      <option value="dark">다크</option>
-                    </select>
-                  </label>
-                  <label>
-                    밀도
-                    <select
-                      aria-label="밀도"
-                      value={density}
-                      onChange={(event) => setDensity(event.target.value)}
-                    >
-                      <option value="comfortable">기본</option>
-                      <option value="compact">조밀하게</option>
-                    </select>
-                  </label>
+              <div className="preview-stage">
+                <div className="preview-toolbar">
+                  <div>
+                    <label>
+                      테마
+                      <select
+                        aria-label="테마"
+                        value={theme}
+                        onChange={(event) => setTheme(event.target.value)}
+                      >
+                        <option value="reference">기본 · Blue</option>
+                        <option value="forest">변형 · Forest</option>
+                      </select>
+                    </label>
+                    <label>
+                      색상 모드
+                      <select
+                        aria-label="색상 모드"
+                        value={colorMode}
+                        onChange={(event) => setColorMode(event.target.value)}
+                      >
+                        <option value="light">라이트</option>
+                        <option value="dark">다크</option>
+                      </select>
+                    </label>
+                    <label>
+                      밀도
+                      <select
+                        aria-label="밀도"
+                        value={density}
+                        onChange={(event) => setDensity(event.target.value)}
+                      >
+                        <option value="comfortable">기본</option>
+                        <option value="compact">조밀하게</option>
+                      </select>
+                    </label>
+                  </div>
+                  <Button
+                    variant="secondary"
+                    onClick={() => setRevision(revision + 1)}
+                    className="reset-button"
+                  >
+                    <RotateCcw size={16} aria-hidden />
+                    초기화
+                  </Button>
                 </div>
-                <button
-                  onClick={() => setRevision(revision + 1)}
-                  className="text-button"
+                <section
+                  className="preview-canvas"
+                  aria-label={`${entry.name} 실습`}
                 >
-                  <RotateCcw size={14} />
-                  초기화
-                </button>
-              </div>
-              <section
-                className="preview-canvas"
-                aria-label={`${entry.name} 실습`}
-              >
-                <entry.Demo key={`${entry.id}-${revision}`} />
-              </section>
-              <div className="preview-footer">
-                <span>마우스와 키보드로 직접 조작해보세요.</span>
-                <span>상태는 예제 안에서만 유지됩니다.</span>
+                  <entry.Demo key={`${entry.id}-${revision}`} />
+                </section>
+                <div className="preview-footer">
+                  <Typography variant="caption">
+                    마우스와 키보드로 직접 조작해보세요.
+                  </Typography>
+                  <Typography variant="caption">
+                    상태는 예제 안에서만 유지됩니다.
+                  </Typography>
+                </div>
               </div>
               <section className="usage-section">
                 <h2>
@@ -395,13 +444,13 @@ export function App({
                     연결하세요.
                   </p>
                 </div>
-                <button
+                <Button
                   className="download-button"
                   onClick={() => downloadSource(entry)}
                 >
-                  <Download size={16} />
+                  <Download size={16} aria-hidden />
                   소스 ZIP
-                </button>
+                </Button>
               </div>
               <ol className="migration-steps">
                 {entry.migration.map((text) => (
@@ -483,13 +532,13 @@ function SourcePanel({ entry }: { entry: CatalogEntry }) {
             ))}
           </select>
         </label>
-        <button className="text-button" onClick={copy}>
+        <Button variant="secondary" onClick={copy}>
           코드 복사
-        </button>
-        <button className="text-button" onClick={() => downloadSource(entry)}>
-          <Download size={15} />
+        </Button>
+        <Button variant="secondary" onClick={() => downloadSource(entry)}>
+          <Download size={16} aria-hidden />
           ZIP
-        </button>
+        </Button>
       </div>
       <p role="status" className="copy-status">
         {copyStatus}

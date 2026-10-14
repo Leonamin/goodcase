@@ -11,7 +11,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-갤러리: http://localhost:5179
+`pnpm dev`는 `0.0.0.0:5179`에 바인딩합니다. 이 컴퓨터에서는 http://localhost:5179, 같은 네트워크의 다른 기기에서는 `http://<컴퓨터의 LAN IP>:5179`로 갤러리에 접속합니다.
 
 ```sh
 pnpm typecheck
