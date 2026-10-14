@@ -1,0 +1,11 @@
+node_modules
+.pnpm-store/
+dist
+storybook-static
+test-results
+playwright-report
+.DS_Store
+*.tsbuildinfo
+work/
+artifacts/use-goodcase-ui/
+artifacts/use-goodcase-ui.zip

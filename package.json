@@ -1,0 +1,39 @@
+{
+  "name": "goodcase",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.10.0",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5179",
+    "build": "tsc -b && vite build",
+    "build:skill": "node scripts/build-skill.mjs",
+    "test:skill": "node --test scripts/build-skill.test.mjs",
+    "typecheck": "tsc -b",
+    "test": "playwright test",
+    "storybook": "storybook dev -p 6019",
+    "build-storybook": "storybook build"
+  },
+  "dependencies": {
+    "fflate": "^0.8.3",
+    "lucide-react": "^0.468.0",
+    "radix-ui": "^1.4.3",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "@storybook/react-vite": "^10.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "prettier": "^3.9.10",
+    "postcss": "^8.5.30",
+    "storybook": "^10.0.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.0"
+  }
+}
