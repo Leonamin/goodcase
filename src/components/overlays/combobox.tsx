@@ -21,20 +21,24 @@ export function Combobox({
   const id = useId();
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeValue, setActiveValue] = useState<string | null>(null);
   const isComposing = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    if (isOpen && !isLoading)
-      document
-        .getElementById(`${id}-option-${activeIndex}`)
-        ?.scrollIntoView({ block: "nearest" });
-  }, [activeIndex, id, isOpen, isLoading, query]);
   const selected = options.find((option) => option.value === value);
   const matches = options.filter((option) =>
     option.label.toLocaleLowerCase().includes(query.toLocaleLowerCase()),
   );
   const available = matches.filter((option) => !option.isDisabled);
+  const activeOption =
+    available.find((option) => option.value === activeValue) ?? available[0];
+  const activeIndex = activeOption ? available.indexOf(activeOption) : -1;
+  useEffect(() => {
+    setActiveValue(activeOption?.value ?? null);
+    if (isOpen && !isLoading && activeOption)
+      document
+        .getElementById(`${id}-option-${activeIndex}`)
+        ?.scrollIntoView({ block: "nearest" });
+  }, [activeOption?.value, activeIndex, id, isOpen, isLoading, query]);
   const choose = (option: Option) => {
     onValueChange(option.value);
     setIsOpen(false);
@@ -70,19 +74,19 @@ export function Combobox({
               placeholder="검색해서 선택"
               onFocus={() => {
                 setQuery("");
-                setActiveIndex(0);
+                setActiveValue(null);
                 setIsOpen(true);
               }}
               onClick={() => {
                 if (!isOpen) {
                   setQuery("");
-                  setActiveIndex(0);
+                  setActiveValue(null);
                   setIsOpen(true);
                 }
               }}
               onChange={(event) => {
                 setQuery(event.target.value);
-                setActiveIndex(0);
+                setActiveValue(null);
                 setIsOpen(true);
               }}
               onCompositionStart={() => {
@@ -97,20 +101,18 @@ export function Combobox({
                 if (event.key === "ArrowDown" || event.key === "ArrowUp") {
                   event.preventDefault();
                   setIsOpen(true);
-                  setActiveIndex((index) =>
-                    Math.max(
-                      0,
-                      Math.min(
-                        available.length - 1,
-                        index + (event.key === "ArrowDown" ? 1 : -1),
-                      ),
+                  const nextIndex = Math.max(
+                    0,
+                    Math.min(
+                      available.length - 1,
+                      activeIndex + (event.key === "ArrowDown" ? 1 : -1),
                     ),
                   );
+                  setActiveValue(available[nextIndex]?.value ?? null);
                 }
                 if (event.key === "Enter" && isOpen) {
                   event.preventDefault();
-                  if (!isLoading && available[activeIndex])
-                    choose(available[activeIndex]);
+                  if (!isLoading && activeOption) choose(activeOption);
                 }
                 if (event.key === "Tab") {
                   setIsOpen(false);
@@ -157,9 +159,9 @@ export function Combobox({
                       role="option"
                       aria-selected={option.value === value}
                       aria-disabled={option.isDisabled}
-                      className={`gc-option ${index === activeIndex ? "is-highlighted" : ""}`}
+                      className={`gc-option ${index >= 0 && index === activeIndex ? "is-highlighted" : ""}`}
                       onPointerMove={() => {
-                        if (index >= 0) setActiveIndex(index);
+                        if (index >= 0) setActiveValue(option.value);
                       }}
                       onPointerDown={(event) => event.preventDefault()}
                       onClick={() => {
