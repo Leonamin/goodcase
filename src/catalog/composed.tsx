@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Button, TextField } from "../components/basic";
+import { Button, Checkbox, Input, TextField } from "../components/basic";
 import {
   FormField,
   FormActions,
@@ -28,14 +28,11 @@ function Simulation({
   return (
     <div className="gc-simulation">
       <span>로컬 비동기 시뮬레이션 · 외부 서버 연결 없음</span>
-      <label>
-        <input
-          type="checkbox"
-          checked={isFailing}
-          onChange={(e) => onChange(e.target.checked)}
-        />
-        요청 실패시키기
-      </label>
+      <Checkbox
+        label="요청 실패시키기"
+        isChecked={isFailing}
+        onCheckedChange={(isChecked) => onChange(isChecked)}
+      />
     </div>
   );
 }
@@ -49,9 +46,8 @@ function FieldDemo() {
       isRequired
     >
       {(props) => (
-        <input
+        <Input
           {...props}
-          className="gc-c-input"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="새 프로젝트"
@@ -269,47 +265,35 @@ function ViewerDemo() {
         : images;
   return (
     <div className="gc-composed-demo">
-      <label>
-        <input
-          type="checkbox"
-          checked={hasBrokenImage}
-          onChange={(e) => {
-            setHasBrokenImage(e.target.checked);
-            setIndex(0);
-          }}
-        />
-        이미지 로딩 실패 예제
-      </label>
-      <label>
-        <input
-          type="checkbox"
-          checked={hasSameSource}
-          onChange={(e) => {
-            setHasSameSource(e.target.checked);
-            setIndex(0);
-          }}
-        />
-        같은 원본의 연속 이미지
-      </label>
-      <label>
-        <input
-          type="checkbox"
-          checked={isEmpty}
-          onChange={(e) => {
-            setIsEmpty(e.target.checked);
-            setIndex(0);
-          }}
-        />
-        빈 이미지 목록
-      </label>
-      <label>
-        <input
-          type="checkbox"
-          checked={isAnimated}
-          onChange={(event) => setIsAnimated(event.target.checked)}
-        />
-        스와이프 놓기 보정
-      </label>
+      <Checkbox
+        label="이미지 로딩 실패 예제"
+        isChecked={hasBrokenImage}
+        onCheckedChange={(isChecked) => {
+          setHasBrokenImage(isChecked);
+          setIndex(0);
+        }}
+      />
+      <Checkbox
+        label="같은 원본의 연속 이미지"
+        isChecked={hasSameSource}
+        onCheckedChange={(isChecked) => {
+          setHasSameSource(isChecked);
+          setIndex(0);
+        }}
+      />
+      <Checkbox
+        label="빈 이미지 목록"
+        isChecked={isEmpty}
+        onCheckedChange={(isChecked) => {
+          setIsEmpty(isChecked);
+          setIndex(0);
+        }}
+      />
+      <Checkbox
+        label="스와이프 놓기 보정"
+        isChecked={isAnimated}
+        onCheckedChange={(isChecked) => setIsAnimated(isChecked)}
+      />
       <ImageViewer
         isAnimated={isAnimated}
         images={activeImages}
@@ -326,14 +310,11 @@ function GalleryDemo() {
   const [hasBrokenImage, setHasBrokenImage] = useState(false);
   return (
     <div className="gc-composed-demo">
-      <label>
-        <input
-          type="checkbox"
-          checked={hasBrokenImage}
-          onChange={(e) => setHasBrokenImage(e.target.checked)}
-        />
-        첫 썸네일 실패시키기 · 해제하면 같은 ID로 복구
-      </label>
+      <Checkbox
+        label="첫 썸네일 실패시키기 · 해제하면 같은 ID로 복구"
+        isChecked={hasBrokenImage}
+        onCheckedChange={(isChecked) => setHasBrokenImage(isChecked)}
+      />
       <ImageGallery
         images={images.map((image, index) =>
           index === 0 && hasBrokenImage
@@ -455,7 +436,7 @@ export const composedEntries: CatalogEntry[] = [
     ],
     ["기본", "필수", "설명", "30자 초과 오류"],
     ["Tab으로 입력에 접근", "label 클릭으로 입력 포커스"],
-    '<FormField label="이름" error={error} isRequired>{props => <input {...props} />}</FormField>',
+    '<FormField label="이름" error={error} isRequired>{props => <Input {...props} />}</FormField>',
   ),
   entry(
     "form-actions",
@@ -526,6 +507,7 @@ export const composedEntries: CatalogEntry[] = [
       "안정적인 row.id로 선택 상태를 관리합니다.",
       "이름 정렬 변경 시 첫 페이지로 이동하고 선택을 해제합니다.",
       "전체 선택은 현재 페이지에만 적용되며 일부 선택 상태를 표시합니다.",
+      "행·전체 선택은 공용 Checkbox를 사용하며 숨긴 라벨과 일부 선택 상태를 동일하게 지원합니다.",
       "페이지 이동 또는 rows 변경 시 선택을 해제합니다.",
       "최초 로딩·빈 결과·오류·재시도·기존 내용 유지 새로고침을 지원합니다.",
       "columns의 render/compare와 getRowId로 다른 데이터 모델에 이식합니다. isSortable/isSelectable 기본 true로 기능을 끌 수 있습니다.",
@@ -552,6 +534,7 @@ export const composedEntries: CatalogEntry[] = [
     [
       "기본 PNG/JPEG/SVG, 최대 3개·파일당 2MB를 선택 전에 검증합니다.",
       "선택·드롭은 업로드하지 않습니다. 명시적 업로드 버튼으로 시작합니다.",
+      "보이는 파일 선택 액션은 공용 Button이며 숨긴 native file 입력이 운영체제 파일 선택기를 엽니다.",
       "파일별 진행률, 성공, 실패, 재시도, 제거를 지원합니다.",
       "제거·unmount 시 AbortSignal로 요청 취소를 전달합니다.",
       "onUpload 외부 어댑터가 실제 저장을 수행하며 서버에서도 파일 검증이 필요합니다.",

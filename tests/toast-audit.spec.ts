@@ -1,3 +1,4 @@
+import { selectOption } from "./helpers/select-option";
 import { test, expect } from "@playwright/test";
 const cards = ".gc-toast-viewport .gc-toast";
 
@@ -5,7 +6,7 @@ test("hover pauses only the target while sibling expires; WAAPI keeps smooth ind
   page,
 }) => {
   await page.goto("/?component=toast");
-  await page.getByLabel("자동 닫힘 시간").selectOption("1500");
+  await selectOption(page.getByLabel("자동 닫힘 시간"), "1500");
   await page.getByRole("button", { name: "성공 알림", exact: true }).click();
   await page.getByRole("button", { name: "정보 알림", exact: true }).click();
   await page.mouse.move(1, 1);
@@ -41,8 +42,8 @@ test("collapsed stack excludes back cards from interaction, F8 expands, FIFO que
   page,
 }) => {
   await page.goto("/?component=toast");
-  await page.getByLabel("알림 배치").selectOption("stack");
-  await page.getByLabel("스택 표시 개수").selectOption("2");
+  await selectOption(page.getByLabel("알림 배치"), "stack");
+  await selectOption(page.getByLabel("스택 표시 개수"), "2");
   await page.getByRole("button", { name: "여러 알림 띄우기" }).click();
   await page.mouse.move(1, 1);
   const slots = page.locator(".gc-toast-slot");
@@ -88,9 +89,9 @@ test("expanded variable heights scroll within viewport and retain readable focus
 }) => {
   await page.setViewportSize({ width: 320, height: 400 });
   await page.goto("/?component=toast");
-  await page.getByLabel("알림 배치").selectOption("stack");
-  await page.getByLabel("스택 표시 개수").selectOption("5");
-  await page.getByLabel("진입 방향").selectOption("down");
+  await selectOption(page.getByLabel("알림 배치"), "stack");
+  await selectOption(page.getByLabel("스택 표시 개수"), "5");
+  await selectOption(page.getByLabel("진입 방향"), "down");
   await page.getByRole("button", { name: "여러 알림 띄우기" }).click();
   await page.mouse.move(1, 1);
   await page.keyboard.press("F8");
@@ -143,7 +144,7 @@ test("reduced motion eliminates entry/layout/exit effects and dismissal remains 
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/?component=toast");
-  await page.getByLabel("진입 방향").selectOption("down");
+  await selectOption(page.getByLabel("진입 방향"), "down");
   await page.getByRole("button", { name: "오류 알림", exact: true }).click();
   await page.mouse.move(1, 1);
   const card = page.locator(cards);
@@ -158,7 +159,7 @@ test("reduced motion eliminates entry/layout/exit effects and dismissal remains 
     "pointer-events",
     "none",
   );
-  await page.getByLabel("자동 닫힘 시간").selectOption("1500");
+  await selectOption(page.getByLabel("자동 닫힘 시간"), "1500");
   await page.getByRole("button", { name: "정보 알림", exact: true }).click();
   await page.mouse.move(1, 1);
   await expect

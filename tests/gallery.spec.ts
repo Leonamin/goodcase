@@ -1,3 +1,4 @@
+import { selectOption } from "./helpers/select-option";
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { unzipSync, strFromU8 } from "fflate";
@@ -11,6 +12,8 @@ const ids = [
   "button",
   "link",
   "text-field",
+  "stepper",
+  "slider",
   "text-area",
   "checkbox",
   "radio-group",
@@ -82,7 +85,7 @@ test("navigation, docs deep links, theme and review survive refresh", async ({
   await page.reload();
   await expect(page.getByRole("button", { name: "검토 완료" })).toBeVisible();
   await page.getByRole("link", { name: "미리보기", exact: true }).click();
-  await page.getByLabel("테마", { exact: true }).selectOption("forest");
+  await selectOption(page.getByLabel("테마", { exact: true }), "forest");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "forest");
 });
 

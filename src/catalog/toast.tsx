@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "../components/basic";
+import { Select } from "../components/overlays";
 import {
   ToastProvider,
   ToastPreview,
@@ -33,72 +34,63 @@ function ToastDemoContent({
   return (
     <div className="gc-toast-demo">
       <div className="gc-toast-demo-controls">
-        <label>
-          알림 배치
-          <select
-            value={layout}
-            onChange={(e) => onLayoutChange(e.target.value as "list" | "stack")}
-          >
-            <option value="list">목록</option>
-            <option value="stack">겹침 스택</option>
-          </select>
-        </label>
-        <label>
-          스택 표시 개수
-          <select
-            value={stackSize}
-            onChange={(e) => onStackSizeChange(Number(e.target.value))}
-          >
-            <option value={2}>2개</option>
-            <option value={3}>3개</option>
-            <option value={5}>5개</option>
-          </select>
-        </label>
-        <label>
-          진입 방향
-          <select
-            value={direction}
-            onChange={(e) => onDirectionChange(e.target.value as "up" | "down")}
-          >
-            <option value="up">아래에서 위 · 화면 하단</option>
-            <option value="down">위에서 아래 · 화면 상단</option>
-          </select>
-        </label>
-        <label>
-          타이머 표현
-          <select
-            value={timer}
-            onChange={(event) => setTimer(event.target.value as typeof timer)}
-          >
-            <option value="bar">하단 바</option>
-            <option value="circle">닫기 버튼 원형</option>
-            <option value="none">표현 없음</option>
-          </select>
-        </label>
-        <label>
-          알림 배경
-          <select
-            value={appearance}
-            onChange={(event) =>
-              setAppearance(event.target.value as typeof appearance)
-            }
-          >
-            <option value="surface">테마 표면 · 기본</option>
-            <option value="tinted">옅은 상태색</option>
-            <option value="solid">진한 상태색</option>
-          </select>
-        </label>
-        <label>
-          자동 닫힘 시간
-          <select
-            value={durationMs}
-            onChange={(event) => setDurationMs(Number(event.target.value))}
-          >
-            <option value={5000}>5초 · 기본</option>
-            <option value={1500}>1.5초 · 빠른 확인</option>
-            <option value={10000}>10초</option>
-          </select>
-        </label>
+        <Select
+          label="알림 배치"
+          value={layout}
+          onValueChange={(next) => onLayoutChange(next as "list" | "stack")}
+          options={[
+            { value: "list", label: "목록" },
+            { value: "stack", label: "겹침 스택" },
+          ]}
+        />
+        <Select
+          label="스택 표시 개수"
+          value={String(stackSize)}
+          onValueChange={(next) => onStackSizeChange(Number(next))}
+          options={[2, 3, 5].map((value) => ({
+            value: String(value),
+            label: `${value}개`,
+          }))}
+        />
+        <Select
+          label="진입 방향"
+          value={direction}
+          onValueChange={(next) => onDirectionChange(next as "up" | "down")}
+          options={[
+            { value: "up", label: "아래에서 위 · 화면 하단" },
+            { value: "down", label: "위에서 아래 · 화면 상단" },
+          ]}
+        />
+        <Select
+          label="타이머 표현"
+          value={timer}
+          onValueChange={(next) => setTimer(next as typeof timer)}
+          options={[
+            { value: "bar", label: "하단 바" },
+            { value: "circle", label: "닫기 버튼 원형" },
+            { value: "none", label: "표현 없음" },
+          ]}
+        />
+        <Select
+          label="알림 배경"
+          value={appearance}
+          onValueChange={(next) => setAppearance(next as typeof appearance)}
+          options={[
+            { value: "surface", label: "테마 표면 · 기본" },
+            { value: "tinted", label: "옅은 상태색" },
+            { value: "solid", label: "진한 상태색" },
+          ]}
+        />
+        <Select
+          label="자동 닫힘 시간"
+          value={String(durationMs)}
+          onValueChange={(next) => setDurationMs(Number(next))}
+          options={[
+            { value: "5000", label: "5초 · 기본" },
+            { value: "1500", label: "1.5초 · 빠른 확인" },
+            { value: "10000", label: "10초" },
+          ]}
+        />
       </div>
       <div className="gc-actions">
         <Button

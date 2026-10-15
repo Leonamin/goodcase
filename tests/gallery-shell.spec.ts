@@ -1,3 +1,4 @@
+import { selectOption } from "./helpers/select-option";
 import { test, expect } from "@playwright/test";
 
 test("empty search can recover without losing the current component", async ({
@@ -60,20 +61,22 @@ test("appearance changes preserve input while reset clears only the demo", async
   await page.goto("/?component=text-field");
   const field = page.getByLabel("프로젝트 이름");
   await field.fill("조작 중인 프로젝트 이름");
-  await page.getByLabel("테마", { exact: true }).selectOption("forest");
-  await page.getByLabel("색상 모드", { exact: true }).selectOption("dark");
-  await page.getByLabel("밀도", { exact: true }).selectOption("compact");
+  await selectOption(page.getByLabel("테마", { exact: true }), "forest");
+  await selectOption(page.getByLabel("색상 모드", { exact: true }), "dark");
+  await selectOption(page.getByLabel("밀도", { exact: true }), "compact");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "forest");
   await expect(page.locator("html")).toHaveAttribute("data-color-mode", "dark");
   await expect(page.locator("html")).toHaveAttribute("data-density", "compact");
   await expect(field).toHaveValue("조작 중인 프로젝트 이름");
   await page.getByRole("button", { name: "초기화", exact: true }).click();
   await expect(field).toHaveValue("");
-  await expect(page.getByLabel("테마", { exact: true })).toHaveValue("forest");
-  await expect(page.getByLabel("색상 모드", { exact: true })).toHaveValue(
-    "dark",
+  await expect(page.getByLabel("테마", { exact: true })).toHaveText(
+    "변형 · Forest",
   );
-  await expect(page.getByLabel("밀도", { exact: true })).toHaveValue("compact");
+  await expect(page.getByLabel("색상 모드", { exact: true })).toHaveText(
+    "다크",
+  );
+  await expect(page.getByLabel("밀도", { exact: true })).toHaveText("조밀하게");
 });
 
 test("source copy writes the selected file and failed copy is recoverable", async ({
@@ -83,7 +86,7 @@ test("source copy writes the selected file and failed copy is recoverable", asyn
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.goto("/?component=image-viewer&tab=source");
   const file = page.getByLabel("소스 파일");
-  await file.selectOption("src/styles/tokens.css");
+  await selectOption(file, "src/styles/tokens.css");
   const source = await page.locator(".source-panel pre code").textContent();
   expect(source).toContain("--gc-");
   await page.getByRole("button", { name: "코드 복사", exact: true }).click();
@@ -102,7 +105,7 @@ test("source copy writes the selected file and failed copy is recoverable", asyn
   await page.getByRole("button", { name: "코드 복사", exact: true }).click();
   await expect(page.locator(".copy-status")).toContainText("복사 실패");
   await expect(page.locator(".source-panel pre code")).toHaveText(source!);
-  await file.selectOption("src/components/basic/index.tsx");
+  await selectOption(file, "src/components/basic/index.tsx");
   await expect(page.locator(".copy-status")).toBeEmpty();
 });
 

@@ -1,4 +1,6 @@
 import { test, expect } from "@playwright/test";
+import { readFile } from "node:fs/promises";
+import { selectOption } from "./helpers/select-option";
 
 test("numeric TextField hides browser spinners and keeps keyboard editing", async ({
   page,
@@ -83,7 +85,10 @@ test("Stepper decimal steps, empty edits and read-only/disabled states stay usab
   for (const width of [1440, 320]) {
     await page.setViewportSize({ width, height: 1000 });
     for (const density of ["comfortable", "compact"]) {
-      await page.getByRole("combobox", { name: "밀도", exact: true }).selectOption(density);
+      await selectOption(
+        page.getByRole("combobox", { name: "밀도", exact: true }),
+        density,
+      );
       const geometry = await increase.evaluate((el) => {
         const icon = el.querySelector("svg")!.getBoundingClientRect();
         const box = el.getBoundingClientRect();
@@ -149,4 +154,35 @@ test("Accordion animates opening and closing, with instant and reduced-motion mo
   await expect(
     page.getByRole("button", { name: "비활성 항목" }),
   ).toBeDisabled();
+});
+
+test("preview toolbar uses shared Select and preserves theme, cancellation and content", async ({
+  page,
+}) => {
+  for (const file of ["src/App.tsx", "src/catalog/toast.tsx"]) {
+    expect(await readFile(file, "utf8"), file).not.toMatch(/<select\b/);
+  }
+  await page.goto("/?component=text-field");
+  const input = page.getByRole("textbox", { name: "프로젝트 이름" });
+  await input.fill("선택을 바꿔도 유지");
+  const theme = page.getByRole("combobox", { name: "테마", exact: true });
+  await expect(theme).toHaveClass(/gc-select/);
+  await theme.click();
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Escape");
+  await expect(theme).toBeFocused();
+  await expect(theme).toHaveText("기본 · Blue");
+  await selectOption(theme, "forest");
+  await selectOption(
+    page.getByRole("combobox", { name: "색상 모드", exact: true }),
+    "dark",
+  );
+  await selectOption(
+    page.getByRole("combobox", { name: "밀도", exact: true }),
+    "compact",
+  );
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "forest");
+  await expect(page.locator("html")).toHaveAttribute("data-color-mode", "dark");
+  await expect(page.locator("html")).toHaveAttribute("data-density", "compact");
+  await expect(input).toHaveValue("선택을 바꿔도 유지");
 });

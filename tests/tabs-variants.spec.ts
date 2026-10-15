@@ -1,3 +1,4 @@
+import { selectOption } from "./helpers/select-option";
 import { test, expect } from "@playwright/test";
 
 test("all tab variants preserve manual keyboard activation and disabled skipping", async ({
@@ -312,7 +313,10 @@ test("moving indicators decelerate, retarget continuously, and track resize", as
       )
       .toBeLessThan(1);
   }
-  await page.getByRole("combobox", { name: "밀도", exact: true }).selectOption("compact");
+  await selectOption(
+    page.getByRole("combobox", { name: "밀도", exact: true }),
+    "compact",
+  );
   await page.setViewportSize({ width: 320, height: 900 });
   for (const name of ["기본 탭 예제", "분할형 탭 예제", "하단형 탭 예제"]) {
     const list = page.getByRole("tablist", { name });

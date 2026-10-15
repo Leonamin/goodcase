@@ -27,6 +27,15 @@
   outline: 2px solid var(--gc-focus);
   outline-offset: 2px;
 }
+.gc-select > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gc-select > span:last-child {
+  flex-shrink: 0;
+}
 .gc-combobox-input input {
   width: 100%;
   min-width: 0;
@@ -63,6 +72,10 @@
   font-size: var(--gc-text-base);
   cursor: pointer;
   outline: none;
+}
+.gc-option > span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .gc-option[data-highlighted],
 .gc-option.is-highlighted {

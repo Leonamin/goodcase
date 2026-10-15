@@ -59,6 +59,7 @@ export function Select({
               {options.map((option) => (
                 <RSelect.Item
                   className="gc-option"
+                  data-value={option.value}
                   key={option.value}
                   value={option.value}
                   disabled={option.isDisabled}

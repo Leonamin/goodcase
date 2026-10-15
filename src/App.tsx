@@ -18,6 +18,7 @@ import {
   TextField,
   Typography,
 } from "./components/basic";
+import { Select } from "./components/overlays";
 import { entries } from "./catalog";
 import { downloadSource, filesFor, sourceFiles } from "./catalog/source";
 import type { CatalogEntry } from "./catalog/types";
@@ -256,6 +257,7 @@ export function App({
       </aside>
       {isNavOpen && (
         <button
+          data-interaction-exception="sidebar-backdrop"
           className="nav-backdrop"
           tabIndex={-1}
           aria-label="목록 닫기"
@@ -330,39 +332,33 @@ export function App({
               <div className="preview-stage">
                 <div className="preview-toolbar">
                   <div>
-                    <label>
-                      테마
-                      <select
-                        aria-label="테마"
-                        value={theme}
-                        onChange={(event) => setTheme(event.target.value)}
-                      >
-                        <option value="reference">기본 · Blue</option>
-                        <option value="forest">변형 · Forest</option>
-                      </select>
-                    </label>
-                    <label>
-                      색상 모드
-                      <select
-                        aria-label="색상 모드"
-                        value={colorMode}
-                        onChange={(event) => setColorMode(event.target.value)}
-                      >
-                        <option value="light">라이트</option>
-                        <option value="dark">다크</option>
-                      </select>
-                    </label>
-                    <label>
-                      밀도
-                      <select
-                        aria-label="밀도"
-                        value={density}
-                        onChange={(event) => setDensity(event.target.value)}
-                      >
-                        <option value="comfortable">기본</option>
-                        <option value="compact">조밀하게</option>
-                      </select>
-                    </label>
+                    <Select
+                      label="테마"
+                      value={theme}
+                      onValueChange={setTheme}
+                      options={[
+                        { value: "reference", label: "기본 · Blue" },
+                        { value: "forest", label: "변형 · Forest" },
+                      ]}
+                    />
+                    <Select
+                      label="색상 모드"
+                      value={colorMode}
+                      onValueChange={setColorMode}
+                      options={[
+                        { value: "light", label: "라이트" },
+                        { value: "dark", label: "다크" },
+                      ]}
+                    />
+                    <Select
+                      label="밀도"
+                      value={density}
+                      onValueChange={setDensity}
+                      options={[
+                        { value: "comfortable", label: "기본" },
+                        { value: "compact", label: "조밀하게" },
+                      ]}
+                    />
                   </div>
                   <Button
                     variant="secondary"
@@ -517,21 +513,15 @@ function SourcePanel({ entry }: { entry: CatalogEntry }) {
   return (
     <section className="source-panel">
       <div className="source-toolbar">
-        <label>
-          파일
-          <select
-            aria-label="소스 파일"
-            value={file}
-            onChange={(event) => {
-              setFile(event.target.value);
-              setCopyStatus("");
-            }}
-          >
-            {files.map((path) => (
-              <option key={path}>{path}</option>
-            ))}
-          </select>
-        </label>
+        <Select
+          label="소스 파일"
+          value={file}
+          onValueChange={(next) => {
+            setFile(next);
+            setCopyStatus("");
+          }}
+          options={files.map((path) => ({ value: path, label: path }))}
+        />
         <Button variant="secondary" onClick={copy}>
           코드 복사
         </Button>

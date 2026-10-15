@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Info } from "lucide-react";
 import {
   Button,
+  Checkbox,
   IconButton,
   Switch,
   TextField,
@@ -62,14 +63,11 @@ function ComboboxDemo() {
         options={options}
         isLoading={isLoading}
       />
-      <label className="gc-overlay-note">
-        <input
-          type="checkbox"
-          checked={isLoading}
-          onChange={(event) => setIsLoading(event.target.checked)}
-        />{" "}
-        로딩 상태 보기 (로컬 예제)
-      </label>
+      <Checkbox
+        label="로딩 상태 보기 (로컬 예제)"
+        isChecked={isLoading}
+        onCheckedChange={(isChecked) => setIsLoading(isChecked)}
+      />
       <p className="gc-overlay-result">
         선택값: {value || "없음"}. 검색어는 선택값에 저장되지 않습니다.
       </p>
@@ -114,14 +112,11 @@ function PopoverDemo() {
     <Popover label="표시 설정" trigger={<Button>표시 설정</Button>}>
       <strong>표시 설정</strong>
       <p className="gc-overlay-note">작은 패널 안에서 설정을 바꿉니다.</p>
-      <label>
-        <input
-          type="checkbox"
-          checked={isCompact}
-          onChange={(event) => setIsCompact(event.target.checked)}
-        />{" "}
-        조밀하게 표시
-      </label>
+      <Checkbox
+        label="조밀하게 표시"
+        isChecked={isCompact}
+        onCheckedChange={(isChecked) => setIsCompact(isChecked)}
+      />
     </Popover>
   );
 }

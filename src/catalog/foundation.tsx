@@ -71,7 +71,9 @@ export const foundationEntries: CatalogEntry[] = [
       "기본 밀도",
       "조밀한 밀도",
     ],
-    keyboard: ["테마·밀도 선택은 네이티브 select로 조작합니다."],
+    keyboard: [
+      "테마·색상 모드·밀도는 공용 Select로 조작합니다. 방향키로 탐색하고 Enter로 확정하며 Escape로 취소합니다.",
+    ],
     files: ["src/styles/tokens.css"],
     dependencies: ["CSS custom properties"],
     migration: [

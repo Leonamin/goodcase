@@ -1,11 +1,12 @@
+import { selectOption } from "./helpers/select-option";
 import { test, expect } from "@playwright/test";
 const live = ".gc-toast-viewport .gc-toast";
 test("circle countdown pauses on hover and focus, shows close icon, then resumes expiry", async ({
   page,
 }) => {
   await page.goto("/?component=toast");
-  await page.getByLabel("타이머 표현").selectOption("circle");
-  await page.getByLabel("자동 닫힘 시간").selectOption("1500");
+  await selectOption(page.getByLabel("타이머 표현"), "circle");
+  await selectOption(page.getByLabel("자동 닫힘 시간"), "1500");
   await page.getByRole("button", { name: "정보 알림", exact: true }).click();
   await page.mouse.move(1, 1);
   const toast = page.locator(live).first();
@@ -41,8 +42,8 @@ test("persistent errors have no fake timer and F8 keyboard close stays usable", 
   page,
 }) => {
   await page.goto("/?component=toast");
-  await page.getByLabel("타이머 표현").selectOption("circle");
-  await page.getByLabel("자동 닫힘 시간").selectOption("1500");
+  await selectOption(page.getByLabel("타이머 표현"), "circle");
+  await selectOption(page.getByLabel("자동 닫힘 시간"), "1500");
   await page.getByRole("button", { name: "오류 알림", exact: true }).click();
   await page.mouse.move(1, 1);
   const toast = page.locator(live);
@@ -99,12 +100,12 @@ test("surface follows theme, backgrounds vary, title icon close align at 24px, m
   const light = await toast.evaluate(
     (element) => getComputedStyle(element).backgroundColor,
   );
-  await page.getByLabel("색상 모드", { exact: true }).selectOption("dark");
+  await selectOption(page.getByLabel("색상 모드", { exact: true }), "dark");
   await expect(toast).toHaveCSS("background-color", "rgb(32, 37, 46)");
   expect(light).not.toBe("rgb(32, 37, 46)");
   await toast.getByRole("button", { name: /알림 닫기/ }).click();
   await expect(page.locator(live)).toHaveCount(0);
-  await page.getByLabel("알림 배경").selectOption("tinted");
+  await selectOption(page.getByLabel("알림 배경"), "tinted");
   await page.getByRole("button", { name: "오류 알림", exact: true }).click();
   await expect(page.locator(live)).toHaveClass(/gc-toast-tinted/);
   const tinted = await page
@@ -115,7 +116,7 @@ test("surface follows theme, backgrounds vary, title icon close align at 24px, m
     .getByRole("button", { name: /알림 닫기/ })
     .click();
   await expect(page.locator(live)).toHaveCount(0);
-  await page.getByLabel("알림 배경").selectOption("solid");
+  await selectOption(page.getByLabel("알림 배경"), "solid");
   await page.getByRole("button", { name: "오류 알림", exact: true }).click();
   await expect(page.locator(live)).toHaveClass(/gc-toast-solid/);
   expect(
@@ -128,7 +129,7 @@ test("individual hover pauses only that card while sibling timer expires", async
   page,
 }) => {
   await page.goto("/?component=toast");
-  await page.getByLabel("자동 닫힘 시간").selectOption("1500");
+  await selectOption(page.getByLabel("자동 닫힘 시간"), "1500");
   await page.getByRole("button", { name: "정보 알림", exact: true }).click();
   await page.getByRole("button", { name: "경고 알림", exact: true }).click();
   const first = page
@@ -154,7 +155,7 @@ test("viewport empty padding does not pause siblings and no visual timer still e
   page,
 }) => {
   await page.goto("/?component=toast");
-  await page.getByLabel("자동 닫힘 시간").selectOption("1500");
+  await selectOption(page.getByLabel("자동 닫힘 시간"), "1500");
   await page.getByRole("button", { name: "정보 알림", exact: true }).click();
   await page.locator(".gc-toast-viewport").hover({ position: { x: 2, y: 2 } });
   await page
@@ -166,7 +167,7 @@ test("viewport empty padding does not pause siblings and no visual timer still e
     "false",
   );
   await expect(page.locator(live)).toHaveCount(0, { timeout: 2500 });
-  await page.getByLabel("타이머 표현").selectOption("none");
+  await selectOption(page.getByLabel("타이머 표현"), "none");
   await page.getByRole("button", { name: "정보 알림", exact: true }).click();
   await page.mouse.move(1, 1);
   await expect(page.locator(live)).toHaveCount(1);
