@@ -7,7 +7,14 @@ import {
   type ReactNode,
 } from "react";
 import { Dialog, Select } from "../overlays";
-import { Button, Pagination, TextField, Progress } from "../basic";
+import {
+  Button,
+  Checkbox,
+  Pagination,
+  Skeleton,
+  TextField,
+  Progress,
+} from "../basic";
 
 export function FormField({
   label,
@@ -235,8 +242,8 @@ export function AsyncContent({
   if (isLoading)
     return (
       <div className="gc-async" role="status" aria-label="처음 불러오는 중">
-        <div className="gc-c-skeleton" />
-        <div className="gc-c-skeleton" />
+        <Skeleton height={20} />
+        <Skeleton height={20} />
         <p>불러오는 중…</p>
       </div>
     );
@@ -339,11 +346,6 @@ export function DataTable<T = DataRow>({
   const hasSomeSelected = visibleRows.some((row) =>
     selectedIds.includes(rowId(row)),
   );
-  const allRef = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    if (allRef.current)
-      allRef.current.indeterminate = hasSomeSelected && !hasAllSelected;
-  }, [hasSomeSelected, hasAllSelected]);
   useEffect(() => {
     setPage(1);
     setSelectedIds([]);
@@ -375,16 +377,13 @@ export function DataTable<T = DataRow>({
             <tr>
               {isSelectable && (
                 <th scope="col">
-                  <input
-                    ref={allRef}
-                    type="checkbox"
-                    className="gc-checkbox-input"
-                    aria-label="현재 페이지 전체 선택"
-                    checked={hasAllSelected}
-                    onChange={(e) =>
-                      setSelectedIds(
-                        e.target.checked ? visibleRows.map(rowId) : [],
-                      )
+                  <Checkbox
+                    label="현재 페이지 전체 선택"
+                    shouldHideLabel
+                    isChecked={hasAllSelected}
+                    isMixed={hasSomeSelected && !hasAllSelected}
+                    onCheckedChange={(isChecked) =>
+                      setSelectedIds(isChecked ? visibleRows.map(rowId) : [])
                     }
                   />
                 </th>
@@ -429,14 +428,13 @@ export function DataTable<T = DataRow>({
               <tr key={rowId(row)}>
                 {isSelectable && (
                   <td>
-                    <input
-                      type="checkbox"
-                      className="gc-checkbox-input"
-                      aria-label={`${rowId(row)} 행 선택`}
-                      checked={selectedIds.includes(rowId(row))}
-                      onChange={(e) =>
+                    <Checkbox
+                      label={`${rowId(row)} 행 선택`}
+                      shouldHideLabel
+                      isChecked={selectedIds.includes(rowId(row))}
+                      onCheckedChange={(isChecked) =>
                         setSelectedIds(
-                          e.target.checked
+                          isChecked
                             ? [...selectedIds, rowId(row)]
                             : selectedIds.filter((id) => id !== rowId(row)),
                         )
@@ -487,6 +485,7 @@ export function FileUploader({
   const [error, setError] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const controllers = useRef(new Map<string, AbortController>());
+  const inputRef = useRef<HTMLInputElement>(null);
   const isMounted = useRef(true);
   const countRef = useRef(0);
   useEffect(() => {
@@ -556,7 +555,7 @@ export function FileUploader({
   }
   return (
     <div>
-      <label
+      <div
         className={`gc-dropzone ${isDragging ? "is-dragging" : ""}`}
         onDragOver={(e) => {
           e.preventDefault();
@@ -569,12 +568,16 @@ export function FileUploader({
           add(e.dataTransfer.files);
         }}
       >
-        <strong>파일을 놓거나 클릭해서 선택</strong>
+        <strong>파일을 놓거나 버튼으로 선택</strong>
         <span className="gc-muted">
           최대 {maxFiles}개 · 파일당 {Math.round(maxBytes / 1024 / 1024)}MB ·{" "}
           {acceptedTypes.join(", ")}
         </span>
         <input
+          ref={inputRef}
+          hidden
+          tabIndex={-1}
+          aria-label="파일 선택"
           type="file"
           multiple
           accept={acceptedTypes.join(",")}
@@ -583,7 +586,10 @@ export function FileUploader({
             e.target.value = "";
           }}
         />
-      </label>
+        <Button variant="secondary" onClick={() => inputRef.current?.click()}>
+          파일 선택
+        </Button>
+      </div>
       {error && (
         <p role="alert" className="gc-error">
           {error}

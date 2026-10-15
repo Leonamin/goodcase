@@ -59,18 +59,18 @@ lucide-react, radix-ui, react, react-dom
 
 ## 코드 위치
 
-- Option: assets/src/components/overlays/index.tsx:19-19
-- Select: assets/src/components/overlays/index.tsx:20-78
-- Combobox: assets/src/components/overlays/index.tsx:79-254
-- MenuItem: assets/src/components/overlays/index.tsx:255-260
-- Menu: assets/src/components/overlays/index.tsx:261-287
-- Popover: assets/src/components/overlays/index.tsx:288-314
-- Tooltip: assets/src/components/overlays/index.tsx:315-335
-- DialogProps: assets/src/components/overlays/index.tsx:336-348
-- Dialog: assets/src/components/overlays/index.tsx:400-402
-- Drawer: assets/src/components/overlays/index.tsx:403-405
-- DialogClose: assets/src/components/overlays/index.tsx:406-408
-- Accordion: assets/src/components/overlays/index.tsx:411-442
+- Option: assets/src/components/overlays/index.tsx:20-20
+- Select: assets/src/components/overlays/index.tsx:21-80
+- Combobox: assets/src/components/overlays/index.tsx:81-256
+- MenuItem: assets/src/components/overlays/index.tsx:257-262
+- Menu: assets/src/components/overlays/index.tsx:263-289
+- Popover: assets/src/components/overlays/index.tsx:290-316
+- Tooltip: assets/src/components/overlays/index.tsx:317-337
+- DialogProps: assets/src/components/overlays/index.tsx:338-350
+- Dialog: assets/src/components/overlays/index.tsx:440-442
+- Drawer: assets/src/components/overlays/index.tsx:443-445
+- DialogClose: assets/src/components/overlays/index.tsx:446-448
+- Accordion: assets/src/components/overlays/index.tsx:451-487
 
 ## 이식
 

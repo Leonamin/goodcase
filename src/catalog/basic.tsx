@@ -602,7 +602,7 @@ function entry(spec: Spec): CatalogEntry {
     ],
     dependencies: [
       "react (hooks, DOM rendering)",
-      "lucide-react (Alert 닫기 아이콘; 다른 컴포넌트만 복사할 때 제거 가능)",
+      "lucide-react (Stepper 증감·Alert 닫기 아이콘; 해당 컴포넌트를 제외하면 제거 가능)",
     ],
     migration: [
       "src/components/basic/index.tsx에서 필요한 export와 해당 타입을 복사하거나 전체 기본 컴포넌트 모듈을 가져옵니다.",

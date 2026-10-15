@@ -4,6 +4,7 @@
 
 ## 동작 계약
 
+- shouldHideLabel은 보이는 라벨만 숨기고 접근 가능한 이름을 유지합니다. 표의 선택 칸에도 같은 Checkbox를 사용합니다.
 - label 클릭으로 값을 토글합니다.
 - isMixed는 indeterminate로 전체 선택의 일부 선택 상태를 표현합니다. 20px 둥근 사각형에 체크 또는 혼합 마이너스를 표시합니다.
 - 네이티브 input 의미를 유지하며 고대비 환경에서는 브라우저 기본 외형으로 전환합니다.
@@ -50,7 +51,7 @@ lucide-react, react, react-dom
 ## 카탈로그 의존성 설명
 
 - react (hooks, DOM rendering)
-- lucide-react (Alert 닫기 아이콘; 다른 컴포넌트만 복사할 때 제거 가능)
+- lucide-react (Stepper 증감·Alert 닫기 아이콘; 해당 컴포넌트를 제외하면 제거 가능)
 
 ## 코드 위치
 
@@ -58,24 +59,31 @@ lucide-react, react, react-dom
 - IconButton: assets/src/components/basic/index.tsx:46-66
 - Link: assets/src/components/basic/index.tsx:67-82
 - FieldProps: assets/src/components/basic/index.tsx:83-87
-- TextField: assets/src/components/basic/index.tsx:88-116
-- TextArea: assets/src/components/basic/index.tsx:117-169
-- Checkbox: assets/src/components/basic/index.tsx:170-200
-- RadioGroup: assets/src/components/basic/index.tsx:201-233
-- Switch: assets/src/components/basic/index.tsx:234-258
-- Badge: assets/src/components/basic/index.tsx:259-267
-- Alert: assets/src/components/basic/index.tsx:268-303
-- Skeleton: assets/src/components/basic/index.tsx:304-318
-- Progress: assets/src/components/basic/index.tsx:319-450
-- Image: assets/src/components/basic/index.tsx:451-494
-- Avatar: assets/src/components/basic/index.tsx:495-517
-- Card: assets/src/components/basic/index.tsx:518-534
-- Table: assets/src/components/basic/index.tsx:535-574
-- Pagination: assets/src/components/basic/index.tsx:575-622
-- Typography: assets/src/components/basic/index.tsx:623-637
-- Stack: assets/src/components/basic/index.tsx:638-652
-- Grid: assets/src/components/basic/index.tsx:653-670
-- Divider: assets/src/components/basic/index.tsx:671-673
+- Input: assets/src/components/basic/index.tsx:88-93
+- TextField: assets/src/components/basic/index.tsx:94-121
+- StepperProps: assets/src/components/basic/index.tsx:122-132
+- Stepper: assets/src/components/basic/index.tsx:139-251
+- SliderProps: assets/src/components/basic/index.tsx:253-261
+- Slider: assets/src/components/basic/index.tsx:262-309
+- TextArea: assets/src/components/basic/index.tsx:311-363
+- Checkbox: assets/src/components/basic/index.tsx:364-398
+- RadioGroup: assets/src/components/basic/index.tsx:399-431
+- Switch: assets/src/components/basic/index.tsx:432-456
+- Badge: assets/src/components/basic/index.tsx:457-465
+- Alert: assets/src/components/basic/index.tsx:466-501
+- SpinnerProps: assets/src/components/basic/index.tsx:502-508
+- Spinner: assets/src/components/basic/index.tsx:510-554
+- Skeleton: assets/src/components/basic/index.tsx:556-570
+- Progress: assets/src/components/basic/index.tsx:571-702
+- Image: assets/src/components/basic/index.tsx:703-746
+- Avatar: assets/src/components/basic/index.tsx:747-769
+- Card: assets/src/components/basic/index.tsx:770-786
+- Table: assets/src/components/basic/index.tsx:787-826
+- Pagination: assets/src/components/basic/index.tsx:827-874
+- Typography: assets/src/components/basic/index.tsx:875-889
+- Stack: assets/src/components/basic/index.tsx:890-904
+- Grid: assets/src/components/basic/index.tsx:905-922
+- Divider: assets/src/components/basic/index.tsx:923-925
 
 ## 이식
 

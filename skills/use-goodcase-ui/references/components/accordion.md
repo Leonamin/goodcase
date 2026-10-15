@@ -8,6 +8,7 @@
 - 제목은 실제 버튼
 - 접힌 내부 요소는 탐색에서 제외
 - 비활성 항목 지원
+- hasAnimation은 기본 true. 높이와 투명도를 240ms로 전환하고 false는 즉시 열고 닫기. prefers-reduced-motion에서는 애니메이션 제거
 
 ## 상태
 
@@ -15,6 +16,8 @@
 - 닫힘
 - 여러 항목 열림
 - 비활성
+- 애니메이션 켜기·끄기
+- 모션 감소
 
 ## 키보드
 
@@ -58,18 +61,18 @@ lucide-react, radix-ui, react, react-dom
 
 ## 코드 위치
 
-- Option: assets/src/components/overlays/index.tsx:19-19
-- Select: assets/src/components/overlays/index.tsx:20-78
-- Combobox: assets/src/components/overlays/index.tsx:79-254
-- MenuItem: assets/src/components/overlays/index.tsx:255-260
-- Menu: assets/src/components/overlays/index.tsx:261-287
-- Popover: assets/src/components/overlays/index.tsx:288-314
-- Tooltip: assets/src/components/overlays/index.tsx:315-335
-- DialogProps: assets/src/components/overlays/index.tsx:336-348
-- Dialog: assets/src/components/overlays/index.tsx:400-402
-- Drawer: assets/src/components/overlays/index.tsx:403-405
-- DialogClose: assets/src/components/overlays/index.tsx:406-408
-- Accordion: assets/src/components/overlays/index.tsx:411-442
+- Option: assets/src/components/overlays/index.tsx:20-20
+- Select: assets/src/components/overlays/index.tsx:21-80
+- Combobox: assets/src/components/overlays/index.tsx:81-256
+- MenuItem: assets/src/components/overlays/index.tsx:257-262
+- Menu: assets/src/components/overlays/index.tsx:263-289
+- Popover: assets/src/components/overlays/index.tsx:290-316
+- Tooltip: assets/src/components/overlays/index.tsx:317-337
+- DialogProps: assets/src/components/overlays/index.tsx:338-350
+- Dialog: assets/src/components/overlays/index.tsx:440-442
+- Drawer: assets/src/components/overlays/index.tsx:443-445
+- DialogClose: assets/src/components/overlays/index.tsx:446-448
+- Accordion: assets/src/components/overlays/index.tsx:451-487
 
 ## 이식
 
@@ -81,7 +84,8 @@ lucide-react, radix-ui, react, react-dom
 ## 사용 예제
 
 ```tsx
-<Accordion items={[{value:"faq",title:"질문",content:"답변"}]} />
+<Accordion items={[{value:"faq",title:"질문",content:"답변"}]} hasAnimation />
+<Accordion items={items} hasAnimation={false} />
 ```
 
 예제의 import, 데이터, 상태, callback은 대상 프로젝트에서 제공합니다. 갤러리 데모는 배포본에 포함되지 않습니다.

@@ -257,7 +257,6 @@
     transition: none !important;
   }
 }
-
 .gc-toast-viewport[data-empty="true"] {
   visibility: hidden;
   pointer-events: none;

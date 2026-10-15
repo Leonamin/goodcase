@@ -36,6 +36,30 @@
     ]
   },
   {
+    "id": "stepper",
+    "name": "Stepper",
+    "category": "basic",
+    "summary": "줄이기·직접 입력·늘리기로 수량과 숫자를 조절합니다.",
+    "reference": "references/components/stepper.md",
+    "files": [
+      "assets/src/components/basic/index.tsx",
+      "assets/src/styles/basic.css",
+      "assets/src/styles/tokens.css"
+    ]
+  },
+  {
+    "id": "slider",
+    "name": "Slider",
+    "category": "basic",
+    "summary": "범위 안의 숫자를 트랙과 키보드로 연속 조절합니다.",
+    "reference": "references/components/slider.md",
+    "files": [
+      "assets/src/components/basic/index.tsx",
+      "assets/src/styles/basic.css",
+      "assets/src/styles/tokens.css"
+    ]
+  },
+  {
     "id": "text-area",
     "name": "TextArea",
     "category": "basic",
@@ -101,6 +125,18 @@
     "category": "basic",
     "summary": "문맥에 유지되는 안내와 오류",
     "reference": "references/components/alert.md",
+    "files": [
+      "assets/src/components/basic/index.tsx",
+      "assets/src/styles/basic.css",
+      "assets/src/styles/tokens.css"
+    ]
+  },
+  {
+    "id": "spinner",
+    "name": "Spinner",
+    "category": "basic",
+    "summary": "원형 선과 속도가 다른 여러 원으로 불확정 로딩을 표시합니다.",
+    "reference": "references/components/spinner.md",
     "files": [
       "assets/src/components/basic/index.tsx",
       "assets/src/styles/basic.css",

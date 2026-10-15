@@ -56,22 +56,22 @@ lucide-react, radix-ui, react, react-dom
 
 ## 코드 위치
 
-- FormField: assets/src/components/composed/index.tsx:12-50
-- FormActions: assets/src/components/composed/index.tsx:51-84
-- ConfirmDialog: assets/src/components/composed/index.tsx:85-159
-- FilterValues: assets/src/components/composed/index.tsx:160-160
-- SearchFilterBar: assets/src/components/composed/index.tsx:161-219
-- AsyncContent: assets/src/components/composed/index.tsx:220-273
-- DataRow: assets/src/components/composed/index.tsx:274-274
-- DataColumn: assets/src/components/composed/index.tsx:275-280
-- DataTable: assets/src/components/composed/index.tsx:281-463
-- UploadItem: assets/src/components/composed/index.tsx:464-470
-- UploadAdapter: assets/src/components/composed/index.tsx:471-474
-- FileUploader: assets/src/components/composed/index.tsx:475-652
-- ViewerImage: assets/src/components/composed/index.tsx:653-653
-- ImageViewer: assets/src/components/composed/index.tsx:654-1359
-- ImageGallery: assets/src/components/composed/index.tsx:1360-1394
-- CopyField: assets/src/components/composed/index.tsx:1404-1431
+- FormField: assets/src/components/composed/index.tsx:19-57
+- FormActions: assets/src/components/composed/index.tsx:58-91
+- ConfirmDialog: assets/src/components/composed/index.tsx:92-166
+- FilterValues: assets/src/components/composed/index.tsx:167-167
+- SearchFilterBar: assets/src/components/composed/index.tsx:168-226
+- AsyncContent: assets/src/components/composed/index.tsx:227-280
+- DataRow: assets/src/components/composed/index.tsx:281-281
+- DataColumn: assets/src/components/composed/index.tsx:282-287
+- DataTable: assets/src/components/composed/index.tsx:288-461
+- UploadItem: assets/src/components/composed/index.tsx:462-468
+- UploadAdapter: assets/src/components/composed/index.tsx:469-472
+- FileUploader: assets/src/components/composed/index.tsx:473-658
+- ViewerImage: assets/src/components/composed/index.tsx:659-659
+- ImageViewer: assets/src/components/composed/index.tsx:660-1365
+- ImageGallery: assets/src/components/composed/index.tsx:1366-1400
+- CopyField: assets/src/components/composed/index.tsx:1410-1437
 
 ## 이식
 
@@ -84,7 +84,7 @@ lucide-react, radix-ui, react, react-dom
 ## 사용 예제
 
 ```tsx
-<FormField label="이름" error={error} isRequired>{props => <input {...props} />}</FormField>
+<FormField label="이름" error={error} isRequired>{props => <Input {...props} />}</FormField>
 ```
 
 예제의 import, 데이터, 상태, callback은 대상 프로젝트에서 제공합니다. 갤러리 데모는 배포본에 포함되지 않습니다.

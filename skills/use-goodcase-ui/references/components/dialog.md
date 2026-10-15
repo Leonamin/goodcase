@@ -6,6 +6,7 @@
 
 - 제목과 접근 가능한 닫기 버튼 제공
 - 포커스는 내부에 유지, 닫으면 호출 요소로 복귀
+- 내부 검색 선택창을 닫는 동안에도 Tab/Shift+Tab은 처음·마지막 요소 사이에서 즉시 순환. 비활성·숨김·inert 요소는 제외하고 포털로 열린 하위 패널은 자체 키보드 탐색 유지
 - 본문은 포커스 링용 안전 여백을 갖고 자식 사이 간격을 제공합니다. 내부 폼 그룹에도 --gc-focus-clearance 이상의 패딩과 간격을 두며 overflow로 링을 자르지 않습니다.
 - 기본은 Escape·바깥 클릭 닫기
 - shouldCloseOnOutsideClick, shouldCloseOnEscape로 닫기 규칙 지정
@@ -60,18 +61,18 @@ lucide-react, radix-ui, react, react-dom
 
 ## 코드 위치
 
-- Option: assets/src/components/overlays/index.tsx:19-19
-- Select: assets/src/components/overlays/index.tsx:20-78
-- Combobox: assets/src/components/overlays/index.tsx:79-254
-- MenuItem: assets/src/components/overlays/index.tsx:255-260
-- Menu: assets/src/components/overlays/index.tsx:261-287
-- Popover: assets/src/components/overlays/index.tsx:288-314
-- Tooltip: assets/src/components/overlays/index.tsx:315-335
-- DialogProps: assets/src/components/overlays/index.tsx:336-348
-- Dialog: assets/src/components/overlays/index.tsx:400-402
-- Drawer: assets/src/components/overlays/index.tsx:403-405
-- DialogClose: assets/src/components/overlays/index.tsx:406-408
-- Accordion: assets/src/components/overlays/index.tsx:411-442
+- Option: assets/src/components/overlays/index.tsx:20-20
+- Select: assets/src/components/overlays/index.tsx:21-80
+- Combobox: assets/src/components/overlays/index.tsx:81-256
+- MenuItem: assets/src/components/overlays/index.tsx:257-262
+- Menu: assets/src/components/overlays/index.tsx:263-289
+- Popover: assets/src/components/overlays/index.tsx:290-316
+- Tooltip: assets/src/components/overlays/index.tsx:317-337
+- DialogProps: assets/src/components/overlays/index.tsx:338-350
+- Dialog: assets/src/components/overlays/index.tsx:440-442
+- Drawer: assets/src/components/overlays/index.tsx:443-445
+- DialogClose: assets/src/components/overlays/index.tsx:446-448
+- Accordion: assets/src/components/overlays/index.tsx:451-487
 
 ## 이식
 

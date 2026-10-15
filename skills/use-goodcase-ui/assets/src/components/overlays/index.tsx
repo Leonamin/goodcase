@@ -5,6 +5,7 @@ import {
   useState,
   type ReactNode,
   type RefObject,
+  type KeyboardEvent,
 } from "react";
 import {
   Select as RSelect,
@@ -58,6 +59,7 @@ export function Select({
               {options.map((option) => (
                 <RSelect.Item
                   className="gc-option"
+                  data-value={option.value}
                   key={option.value}
                   value={option.value}
                   disabled={option.isDisabled}
@@ -346,6 +348,43 @@ export type DialogProps = {
   className?: string;
   shouldCloseOnEscape?: boolean;
 };
+
+function loopModalFocus(event: KeyboardEvent<HTMLDivElement>) {
+  if (
+    event.key !== "Tab" ||
+    event.altKey ||
+    event.ctrlKey ||
+    event.metaKey ||
+    event.defaultPrevented ||
+    !event.currentTarget.contains(event.target as Node)
+  )
+    return;
+  const modal = event.currentTarget;
+  const candidates = Array.from(
+    modal.querySelectorAll<HTMLElement>("*"),
+  ).filter(
+    (element) =>
+      element.tabIndex >= 0 &&
+      !element.matches(":disabled") &&
+      !element.closest("[hidden], [inert]") &&
+      element.getClientRects().length > 0 &&
+      getComputedStyle(element).visibility === "visible",
+  );
+  const first = candidates[0];
+  const last = candidates.at(-1);
+  if (!first || !last) {
+    event.preventDefault();
+    modal.focus();
+    return;
+  }
+  const edge = event.shiftKey ? first : last;
+  if (modal.ownerDocument.activeElement !== edge) return;
+  // A nested Popover temporarily pauses Radix's parent scope until deferred cleanup.
+  // Keep only the modal's Tab boundaries synchronous; portalled child scopes own their keys.
+  event.preventDefault();
+  (event.shiftKey ? last : first).focus();
+}
+
 function Modal({
   trigger,
   title,
@@ -368,6 +407,7 @@ function Modal({
         <RDialog.Content
           className={`gc-modal ${isDrawer ? "gc-drawer" : ""} ${className ?? ""}`}
           {...(!description ? { "aria-describedby": undefined } : {})}
+          onKeyDownCapture={loopModalFocus}
           onOpenAutoFocus={(event) => {
             if (initialFocusRef?.current) {
               event.preventDefault();
@@ -410,6 +450,7 @@ export { Tabs } from "./tabs";
 export type { TabsProps, TabItem, TabsVariant } from "./tabs";
 export function Accordion({
   items,
+  hasAnimation = true,
 }: {
   items: {
     value: string;
@@ -417,9 +458,13 @@ export function Accordion({
     content: ReactNode;
     isDisabled?: boolean;
   }[];
+  hasAnimation?: boolean;
 }) {
   return (
-    <RAccordion.Root type="multiple" className="gc-accordion">
+    <RAccordion.Root
+      type="multiple"
+      className={`gc-accordion${hasAnimation ? " gc-accordion-animated" : ""}`}
+    >
       {items.map((item) => (
         <RAccordion.Item
           key={item.value}

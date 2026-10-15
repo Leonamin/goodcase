@@ -6,6 +6,7 @@
 
 - 기본 PNG/JPEG/SVG, 최대 3개·파일당 2MB를 선택 전에 검증합니다.
 - 선택·드롭은 업로드하지 않습니다. 명시적 업로드 버튼으로 시작합니다.
+- 보이는 파일 선택 액션은 공용 Button이며 숨긴 native file 입력이 운영체제 파일 선택기를 엽니다.
 - 파일별 진행률, 성공, 실패, 재시도, 제거를 지원합니다.
 - 제거·unmount 시 AbortSignal로 요청 취소를 전달합니다.
 - onUpload 외부 어댑터가 실제 저장을 수행하며 서버에서도 파일 검증이 필요합니다.
@@ -61,22 +62,22 @@ lucide-react, radix-ui, react, react-dom
 
 ## 코드 위치
 
-- FormField: assets/src/components/composed/index.tsx:12-50
-- FormActions: assets/src/components/composed/index.tsx:51-84
-- ConfirmDialog: assets/src/components/composed/index.tsx:85-159
-- FilterValues: assets/src/components/composed/index.tsx:160-160
-- SearchFilterBar: assets/src/components/composed/index.tsx:161-219
-- AsyncContent: assets/src/components/composed/index.tsx:220-273
-- DataRow: assets/src/components/composed/index.tsx:274-274
-- DataColumn: assets/src/components/composed/index.tsx:275-280
-- DataTable: assets/src/components/composed/index.tsx:281-463
-- UploadItem: assets/src/components/composed/index.tsx:464-470
-- UploadAdapter: assets/src/components/composed/index.tsx:471-474
-- FileUploader: assets/src/components/composed/index.tsx:475-652
-- ViewerImage: assets/src/components/composed/index.tsx:653-653
-- ImageViewer: assets/src/components/composed/index.tsx:654-1359
-- ImageGallery: assets/src/components/composed/index.tsx:1360-1394
-- CopyField: assets/src/components/composed/index.tsx:1404-1431
+- FormField: assets/src/components/composed/index.tsx:19-57
+- FormActions: assets/src/components/composed/index.tsx:58-91
+- ConfirmDialog: assets/src/components/composed/index.tsx:92-166
+- FilterValues: assets/src/components/composed/index.tsx:167-167
+- SearchFilterBar: assets/src/components/composed/index.tsx:168-226
+- AsyncContent: assets/src/components/composed/index.tsx:227-280
+- DataRow: assets/src/components/composed/index.tsx:281-281
+- DataColumn: assets/src/components/composed/index.tsx:282-287
+- DataTable: assets/src/components/composed/index.tsx:288-461
+- UploadItem: assets/src/components/composed/index.tsx:462-468
+- UploadAdapter: assets/src/components/composed/index.tsx:469-472
+- FileUploader: assets/src/components/composed/index.tsx:473-658
+- ViewerImage: assets/src/components/composed/index.tsx:659-659
+- ImageViewer: assets/src/components/composed/index.tsx:660-1365
+- ImageGallery: assets/src/components/composed/index.tsx:1366-1400
+- CopyField: assets/src/components/composed/index.tsx:1410-1437
 
 ## 이식
 

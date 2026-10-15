@@ -7,6 +7,7 @@
 - 안정적인 row.id로 선택 상태를 관리합니다.
 - 이름 정렬 변경 시 첫 페이지로 이동하고 선택을 해제합니다.
 - 전체 선택은 현재 페이지에만 적용되며 일부 선택 상태를 표시합니다.
+- 행·전체 선택은 공용 Checkbox를 사용하며 숨긴 라벨과 일부 선택 상태를 동일하게 지원합니다.
 - 페이지 이동 또는 rows 변경 시 선택을 해제합니다.
 - 최초 로딩·빈 결과·오류·재시도·기존 내용 유지 새로고침을 지원합니다.
 - columns의 render/compare와 getRowId로 다른 데이터 모델에 이식합니다. isSortable/isSelectable 기본 true로 기능을 끌 수 있습니다.
@@ -64,22 +65,22 @@ lucide-react, radix-ui, react, react-dom
 
 ## 코드 위치
 
-- FormField: assets/src/components/composed/index.tsx:12-50
-- FormActions: assets/src/components/composed/index.tsx:51-84
-- ConfirmDialog: assets/src/components/composed/index.tsx:85-159
-- FilterValues: assets/src/components/composed/index.tsx:160-160
-- SearchFilterBar: assets/src/components/composed/index.tsx:161-219
-- AsyncContent: assets/src/components/composed/index.tsx:220-273
-- DataRow: assets/src/components/composed/index.tsx:274-274
-- DataColumn: assets/src/components/composed/index.tsx:275-280
-- DataTable: assets/src/components/composed/index.tsx:281-463
-- UploadItem: assets/src/components/composed/index.tsx:464-470
-- UploadAdapter: assets/src/components/composed/index.tsx:471-474
-- FileUploader: assets/src/components/composed/index.tsx:475-652
-- ViewerImage: assets/src/components/composed/index.tsx:653-653
-- ImageViewer: assets/src/components/composed/index.tsx:654-1359
-- ImageGallery: assets/src/components/composed/index.tsx:1360-1394
-- CopyField: assets/src/components/composed/index.tsx:1404-1431
+- FormField: assets/src/components/composed/index.tsx:19-57
+- FormActions: assets/src/components/composed/index.tsx:58-91
+- ConfirmDialog: assets/src/components/composed/index.tsx:92-166
+- FilterValues: assets/src/components/composed/index.tsx:167-167
+- SearchFilterBar: assets/src/components/composed/index.tsx:168-226
+- AsyncContent: assets/src/components/composed/index.tsx:227-280
+- DataRow: assets/src/components/composed/index.tsx:281-281
+- DataColumn: assets/src/components/composed/index.tsx:282-287
+- DataTable: assets/src/components/composed/index.tsx:288-461
+- UploadItem: assets/src/components/composed/index.tsx:462-468
+- UploadAdapter: assets/src/components/composed/index.tsx:469-472
+- FileUploader: assets/src/components/composed/index.tsx:473-658
+- ViewerImage: assets/src/components/composed/index.tsx:659-659
+- ImageViewer: assets/src/components/composed/index.tsx:660-1365
+- ImageGallery: assets/src/components/composed/index.tsx:1366-1400
+- CopyField: assets/src/components/composed/index.tsx:1410-1437
 
 ## 이식
 
