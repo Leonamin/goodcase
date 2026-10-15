@@ -16,7 +16,7 @@ function ButtonDemo() {
           onClick={() => {
             setIsLoading(true);
             timer.current = setTimeout(() => {
-              setCount(count + 1);
+              setCount((previous) => previous + 1);
               setIsLoading(false);
             }, 900);
           }}
@@ -31,21 +31,21 @@ function ButtonDemo() {
         아이콘 버튼 · 기본 ghost / 표면이 있는 filled / 비활성
       </B.Typography>
       <div className="gc-demo-row">
-        <B.IconButton label="즐겨찾기" onClick={() => setCount(count + 1)}>
+        <B.IconButton label="즐겨찾기" onClick={() => setCount((previous) => previous + 1)}>
           <Star size={20} aria-hidden="true" />
         </B.IconButton>
         <B.IconButton
           label="메뉴 열기"
           appearance="filled"
           variant="secondary"
-          onClick={() => setCount(count + 1)}
+          onClick={() => setCount((previous) => previous + 1)}
         >
           <Menu size={20} aria-hidden="true" />
         </B.IconButton>
         <B.IconButton
           label="설정 열기"
           appearance="filled"
-          onClick={() => setCount(count + 1)}
+          onClick={() => setCount((previous) => previous + 1)}
         >
           <Settings size={20} aria-hidden="true" />
         </B.IconButton>
@@ -60,7 +60,7 @@ function ButtonDemo() {
         <B.IconButton
           label="작은 즐겨찾기"
           size="compact"
-          onClick={() => setCount(count + 1)}
+          onClick={() => setCount((previous) => previous + 1)}
         >
           <Star size={16} aria-hidden="true" />
         </B.IconButton>
@@ -69,7 +69,7 @@ function ButtonDemo() {
           size="compact"
           appearance="filled"
           variant="secondary"
-          onClick={() => setCount(count + 1)}
+          onClick={() => setCount((previous) => previous + 1)}
         >
           <Settings size={16} aria-hidden="true" />
         </B.IconButton>
@@ -449,7 +449,7 @@ function CardDemo() {
       title={<B.Link href="#card-details">공유 컴포넌트 정리</B.Link>}
       footer={
         <div className="gc-demo-row">
-          <B.Button variant="secondary" onClick={() => setCount(count + 1)}>
+          <B.Button variant="secondary" onClick={() => setCount((previous) => previous + 1)}>
             즐겨찾기 {count}
           </B.Button>
           <B.Badge>진행 중</B.Badge>

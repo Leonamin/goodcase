@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import {
   Check,
   ChevronRight,
@@ -22,6 +22,7 @@ import { Select } from "./components/overlays";
 import { entries } from "./catalog";
 import { downloadSource, filesFor, sourceFiles } from "./catalog/source";
 import type { CatalogEntry } from "./catalog/types";
+import { useMobileNavigation } from "./gallery/use-mobile-navigation";
 
 const tabs = [
   { id: "preview", label: "미리보기" },
@@ -85,10 +86,9 @@ export function App({
   const [theme, setTheme] = useState("reference");
   const [density, setDensity] = useState("comfortable");
   const [colorMode, setColorMode] = useState("light");
-  const [isNavOpen, setIsNavOpen] = useState(false);
+  const { isNavOpen, setIsNavOpen, sidebarRef } = useMobileNavigation();
   const [reviews, setReviews] = useState(readReviews);
   const [revision, setRevision] = useState(0);
-  const sidebarRef = useRef<HTMLElement>(null);
   const entry = entries.find((item) => item.id === location.id) ?? entries[0];
   const activeTab = tabs.some((tab) => tab.id === location.tab)
     ? location.tab
@@ -109,43 +109,6 @@ export function App({
     document.documentElement.dataset.colorMode = colorMode;
     document.documentElement.dataset.density = density;
   }, [theme, density, colorMode]);
-  useEffect(() => {
-    if (!isNavOpen) return;
-    const previousFocus = document.activeElement as HTMLElement | null;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    const focusable = () =>
-      Array.from(
-        sidebarRef.current?.querySelectorAll<HTMLElement>(
-          "a[href], button:not(:disabled), input:not(:disabled)",
-        ) ?? [],
-      );
-    focusable()[0]?.focus();
-    const handleKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        setIsNavOpen(false);
-      }
-      if (event.key === "Tab") {
-        const items = focusable();
-        const first = items[0];
-        const last = items[items.length - 1];
-        if (event.shiftKey && document.activeElement === first) {
-          event.preventDefault();
-          last?.focus();
-        } else if (!event.shiftKey && document.activeElement === last) {
-          event.preventDefault();
-          first?.focus();
-        }
-      }
-    };
-    document.addEventListener("keydown", handleKey);
-    return () => {
-      document.removeEventListener("keydown", handleKey);
-      document.body.style.overflow = previousOverflow;
-      previousFocus?.focus();
-    };
-  }, [isNavOpen]);
   function navigate(id: string, tab = "preview") {
     setLocation({ id, tab });
     const url = new URL(window.location.href);
