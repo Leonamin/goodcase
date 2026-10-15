@@ -105,7 +105,7 @@ test("source copy writes the selected file and failed copy is recoverable", asyn
   await page.getByRole("button", { name: "코드 복사", exact: true }).click();
   await expect(page.locator(".copy-status")).toContainText("복사 실패");
   await expect(page.locator(".source-panel pre code")).toHaveText(source!);
-  await selectOption(file, "src/components/basic/index.tsx");
+  await selectOption(file, "src/components/basic/button.tsx");
   await expect(page.locator(".copy-status")).toBeEmpty();
 });
 

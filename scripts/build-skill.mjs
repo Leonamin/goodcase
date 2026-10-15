@@ -88,7 +88,7 @@ function sourceDetails(file, text) {
   return { imports, symbols };
 }
 
-function dependenciesFor(files, sources, details) {
+function dependenciesFor(files, sources, details, styleFilesFor) {
   const requiredFiles = new Set();
   const packages = new Set();
   const visit = (file) => {
@@ -96,6 +96,7 @@ function dependenciesFor(files, sources, details) {
     if (!sources.has(file))
       throw new Error(`배포 가능한 파일을 찾을 수 없습니다: ${file}`);
     requiredFiles.add(file);
+    if (file.endsWith(".tsx")) packages.add("react");
     for (const specifier of details.get(file)?.imports ?? []) {
       if (!specifier.startsWith(".")) {
         if (specifier.startsWith("/") || specifier.startsWith("node:"))
@@ -125,8 +126,7 @@ function dependenciesFor(files, sources, details) {
     }
   };
   files.forEach(visit);
-  if (files.some((file) => file.startsWith("src/components/")))
-    styleNames.forEach((name) => visit(`src/styles/${name}.css`));
+  styleFilesFor(requiredFiles).forEach(visit);
   // React's DOM renderer is also required by the host app and Radix peers.
   if (packages.has("react")) packages.add("react-dom");
   return {
@@ -190,8 +190,12 @@ export async function createSkillFiles() {
     optimizeDeps: { noDiscovery: true, include: [] },
   });
   let entries;
+  let styleFilesFor;
   try {
     ({ entries } = await server.ssrLoadModule("/src/catalog/index.ts"));
+    ({ styleFilesFor } = await server.ssrLoadModule(
+      "/src/catalog/source-styles.ts",
+    ));
   } finally {
     await server.close();
   }
@@ -201,7 +205,12 @@ export async function createSkillFiles() {
     if (!/^[a-z0-9-]+$/.test(entry.id) || ids.has(entry.id))
       throw new Error(`잘못되거나 중복된 컴포넌트 id: ${entry.id}`);
     ids.add(entry.id);
-    const dependencies = dependenciesFor(entry.files, sources, details);
+    const dependencies = dependenciesFor(
+      entry.files,
+      sources,
+      details,
+      styleFilesFor,
+    );
     const symbols = entry.files.flatMap(
       (file) => details.get(file)?.symbols ?? [],
     );
@@ -221,6 +230,7 @@ export async function createSkillFiles() {
     [...sources.keys()],
     sources,
     details,
+    styleFilesFor,
   );
   files.set("references/components.json", json(index));
   const pkg = JSON.parse(

@@ -1,5 +1,6 @@
 import { zipSync, strToU8 } from "fflate";
 import type { CatalogEntry } from "./types";
+import { styleFilesFor } from "./source-styles";
 
 const rawFiles = import.meta.glob<string>(
   ["../components/**/*.{tsx,ts}", "../styles/*.css"],
@@ -43,13 +44,7 @@ export function filesFor(entry: CatalogEntry): string[] {
     }
   };
   entry.files.forEach(visit);
-  // Styles are shared by families; carry all reference styles to preserve imported primitives.
-  Object.keys(sourceFiles)
-    .filter(
-      (path) =>
-        path.startsWith("src/styles/") && !path.endsWith("/gallery.css"),
-    )
-    .forEach(visit);
+  styleFilesFor(files).forEach(visit);
   return [...files];
 }
 
@@ -57,6 +52,11 @@ export function packagesFor(entry: CatalogEntry): string[] {
   const packages = new Set<string>();
   for (const file of filesFor(entry)) {
     if (!/\.tsx?$/.test(file)) continue;
+    // React's automatic JSX runtime is an implicit dependency of TSX modules.
+    if (file.endsWith(".tsx")) {
+      packages.add("react");
+      packages.add("react-dom");
+    }
     for (const match of sourceFiles[file].matchAll(
       /(?:from\s*|import\s*)['"]([^'"]+)['"]/g,
     )) {

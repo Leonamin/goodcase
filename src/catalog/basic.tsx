@@ -31,7 +31,10 @@ function ButtonDemo() {
         아이콘 버튼 · 기본 ghost / 표면이 있는 filled / 비활성
       </B.Typography>
       <div className="gc-demo-row">
-        <B.IconButton label="즐겨찾기" onClick={() => setCount((previous) => previous + 1)}>
+        <B.IconButton
+          label="즐겨찾기"
+          onClick={() => setCount((previous) => previous + 1)}
+        >
           <Star size={20} aria-hidden="true" />
         </B.IconButton>
         <B.IconButton
@@ -449,7 +452,10 @@ function CardDemo() {
       title={<B.Link href="#card-details">공유 컴포넌트 정리</B.Link>}
       footer={
         <div className="gc-demo-row">
-          <B.Button variant="secondary" onClick={() => setCount((previous) => previous + 1)}>
+          <B.Button
+            variant="secondary"
+            onClick={() => setCount((previous) => previous + 1)}
+          >
             즐겨찾기 {count}
           </B.Button>
           <B.Badge>진행 중</B.Badge>
@@ -596,16 +602,17 @@ function entry(spec: Spec): CatalogEntry {
       : spec.contracts,
     category: spec.category ?? "basic",
     files: [
-      "src/components/basic/index.tsx",
+      `src/components/basic/${spec.id}.tsx`,
       "src/styles/basic.css",
       "src/styles/tokens.css",
     ],
     dependencies: [
-      "react (hooks, DOM rendering)",
-      "lucide-react (Stepper 증감·Alert 닫기 아이콘; 해당 컴포넌트를 제외하면 제거 가능)",
+      "react",
+      ...(["stepper", "alert"].includes(spec.id) ? ["lucide-react"] : []),
+      "--gc-* 토큰",
     ],
     migration: [
-      "src/components/basic/index.tsx에서 필요한 export와 해당 타입을 복사하거나 전체 기본 컴포넌트 모듈을 가져옵니다.",
+      `src/components/basic/${spec.id}.tsx와 상대 import로 연결된 공용 컴포넌트·타입을 함께 가져옵니다.`,
       "src/styles/basic.css의 해당 .gc-* 규칙과 tokens.css를 가져와 프로젝트 의미 토큰에 연결합니다.",
       "아래 사용 예제의 이벤트를 프로젝트 상태·서비스에 연결합니다. 데모 코드는 이식하지 않습니다.",
       "키보드, 긴 한국어, 비활성·오류 상태와 모바일 너비에서 동작 계약을 재확인합니다.",
@@ -638,7 +645,7 @@ export const basicEntries: CatalogEntry[] = [
     ],
     keyboard: ["Tab으로 포커스", "Enter·Space로 실행"],
     usage:
-      '<Button isLoading={isSaving} onClick={save}>저장</Button>\n<IconButton label="즐겨찾기" onClick={toggleFavorite}><Star size={20} aria-hidden="true" /></IconButton>\n<IconButton label="닫기" size="compact" onClick={close}><X size={16} aria-hidden="true" /></IconButton>',
+      'import { Button, IconButton } from "./components/basic/button";\nimport { Star, X } from "lucide-react";\n\n<Button isLoading={isSaving} onClick={save}>저장</Button>\n<IconButton label="즐겨찾기" onClick={toggleFavorite}><Star size={20} aria-hidden="true" /></IconButton>\n<IconButton label="닫기" size="compact" onClick={close}><X size={16} aria-hidden="true" /></IconButton>',
     Demo: ButtonDemo,
   }),
   entry({
@@ -653,7 +660,8 @@ export const basicEntries: CatalogEntry[] = [
     ],
     states: ["기본", "호버", "포커스"],
     keyboard: ["Tab으로 포커스", "Enter로 이동"],
-    usage: '<Link href="/projects">프로젝트 목록</Link>',
+    usage:
+      'import { Link } from "./components/basic/link";\n\n<Link href="/projects">프로젝트 목록</Link>',
     Demo: LinkDemo,
   }),
   entry({
@@ -678,7 +686,7 @@ export const basicEntries: CatalogEntry[] = [
     ],
     keyboard: ["Tab으로 입력 이동", "표준 텍스트 편집 단축키"],
     usage:
-      '<TextField label="이름" value={name} onChange={e => setName(e.target.value)} error={nameError} />\n// FormField의 render prop 안에서는 <Input {...props} /> 사용',
+      'import { TextField } from "./components/basic/text-field";\nimport { Input } from "./components/basic/input";\n\n<TextField label="이름" value={name} onChange={e => setName(e.target.value)} error={nameError} />\n// FormField의 render prop 안에서는 <Input {...props} /> 사용',
     Demo: TextFieldDemo,
   }),
   entry({
@@ -688,8 +696,8 @@ export const basicEntries: CatalogEntry[] = [
     contracts: [
       "value/onValueChange 제어형. min은 기본 0, step은 기본 1이며 max로 상한을 지정합니다.",
       "기존 IconButton과 숫자 입력을 한 컨트롤로 조합. 최소·최대값에서는 해당 증감 버튼만 비활성화합니다.",
-      "직접 입력은 Enter 또는 포커스 이동 시 확정하며 min 기준 step에 맞춘 뒤 범위 안으로 제한합니다. 빈 입력은 이전 값으로 복원합니다.",
-      "소수 step의 부동소수점 오차를 정리합니다. step은 양수, value/min/max는 유효한 숫자로 전달합니다.",
+      "직접 입력 중에만 draft를 유지합니다. Enter·포커스 이동·증감 조작은 변경을 요청하고 확정 표시는 부모 value를 따릅니다. 부모가 요청을 거절하거나 지연하면 미승인 값은 표시하지 않습니다. 빈 입력은 부모 값으로 복원합니다.",
+      "소수·지수 step은 십진 정밀도를 유지합니다. step은 양수, value/min/max는 유효한 숫자로 전달합니다. 상한이 step에 맞지 않으면 min 기준으로 max 이하의 마지막 step 값이 유효 상한입니다(0~10, step=3이면 9). 직접 입력·버튼·End가 같은 정책을 사용합니다.",
       "label과 입력·설명을 연결하며 error는 aria-invalid로 안내. isReadOnly는 값 확인·선택 가능, isDisabled는 모든 조작 차단.",
       "입력의 기본 증감 화살표를 숨기고 양옆 버튼에 읽을 수 있는 이름을 제공합니다. 브랜드·밀도·다크 모드는 --gc-* 토큰을 따릅니다.",
     ],
@@ -710,7 +718,7 @@ export const basicEntries: CatalogEntry[] = [
       "Enter: 입력 확정",
     ],
     usage:
-      '<Stepper label="수량" value={quantity} onValueChange={setQuantity} min={0} max={10} />\n<Stepper label="간격" value={amount} onValueChange={setAmount} step={0.1} max={2} />',
+      'import { Stepper } from "./components/basic/stepper";\n\n<Stepper label="수량" value={quantity} onValueChange={setQuantity} min={0} max={10} />\n<Stepper label="간격" value={amount} onValueChange={setAmount} step={0.1} max={2} />',
     Demo: StepperDemo,
   }),
   entry({
@@ -737,7 +745,7 @@ export const basicEntries: CatalogEntry[] = [
       "PageUp/PageDown: 브라우저 기본 범위 이동",
     ],
     usage:
-      '<Slider label="볼륨" value={volume} onValueChange={setVolume} valueText={`${volume}%`} />',
+      'import { Slider } from "./components/basic/slider";\n\n<Slider label="볼륨" value={volume} onValueChange={setVolume} valueText={`${volume}%`} />',
     Demo: SliderDemo,
   }),
   entry({
@@ -752,7 +760,7 @@ export const basicEntries: CatalogEntry[] = [
     states: ["빈 입력", "여러 줄", "글자 수 제한", "오류", "비활성"],
     keyboard: ["Enter로 줄바꿈", "Tab으로 다음 입력"],
     usage:
-      '<TextArea label="설명" value={description} onChange={e => setDescription(e.target.value)} shouldAutoSize maxLength={300} />',
+      'import { TextArea } from "./components/basic/text-area";\n\n<TextArea label="설명" value={description} onChange={e => setDescription(e.target.value)} shouldAutoSize maxLength={300} />',
     Demo: TextAreaDemo,
   }),
   entry({
@@ -769,7 +777,7 @@ export const basicEntries: CatalogEntry[] = [
     states: ["미선택", "선택", "혼합", "비활성"],
     keyboard: ["Tab으로 이동", "Space로 토글"],
     usage:
-      '<Checkbox label="전체 선택" isChecked={isAllSelected} isMixed={hasPartialSelection} onCheckedChange={selectAll} />',
+      'import { Checkbox } from "./components/basic/checkbox";\n\n<Checkbox label="전체 선택" isChecked={isAllSelected} isMixed={hasPartialSelection} onCheckedChange={selectAll} />',
     Demo: CheckboxDemo,
   }),
   entry({
@@ -784,7 +792,7 @@ export const basicEntries: CatalogEntry[] = [
     states: ["미선택", "선택", "그룹 비활성"],
     keyboard: ["Tab으로 그룹 이동", "방향키로 선택 이동", "Space로 선택"],
     usage:
-      '<RadioGroup label="주기" value={period} options={periodOptions} onValueChange={setPeriod} />',
+      'import { RadioGroup } from "./components/basic/radio-group";\n\n<RadioGroup label="주기" value={period} options={periodOptions} onValueChange={setPeriod} />',
     Demo: RadioDemo,
   }),
   entry({
@@ -799,7 +807,7 @@ export const basicEntries: CatalogEntry[] = [
     states: ["켜짐", "꺼짐", "비활성"],
     keyboard: ["Tab으로 이동", "Space로 토글"],
     usage:
-      '<Switch label="이메일 알림" isChecked={isEnabled} onCheckedChange={setIsEnabled} />',
+      'import { Switch } from "./components/basic/switch";\n\n<Switch label="이메일 알림" isChecked={isEnabled} onCheckedChange={setIsEnabled} />',
     Demo: SwitchDemo,
   }),
   entry({
@@ -812,7 +820,8 @@ export const basicEntries: CatalogEntry[] = [
     ],
     states: ["중립", "성공", "위험", "주의"],
     keyboard: ["포커스 대상 아님"],
-    usage: '<Badge tone="success">완료</Badge>',
+    usage:
+      'import { Badge } from "./components/basic/badge";\n\n<Badge tone="success">완료</Badge>',
     Demo: BadgeDemo,
   }),
   entry({
@@ -827,7 +836,7 @@ export const basicEntries: CatalogEntry[] = [
     states: ["안내", "성공", "주의", "오류", "닫기 가능"],
     keyboard: ["내부 액션·닫기 버튼은 Tab·Enter·Space"],
     usage:
-      '<Alert title="저장 실패" tone="danger">입력 내용은 유지했어요.</Alert>',
+      'import { Alert } from "./components/basic/alert";\n\n<Alert title="저장 실패" tone="danger">입력 내용은 유지했어요.</Alert>',
     Demo: AlertDemo,
   }),
   entry({
@@ -851,7 +860,7 @@ export const basicEntries: CatalogEntry[] = [
     ],
     keyboard: ["포커스 대상 아님"],
     usage:
-      '<Spinner label="목록을 불러오는 중" />\n<Spinner variant="orbit" size="large" label="이미지를 준비하는 중" />\n<Button disabled><Spinner size="small" tone="inherit" isDecorative /> 처리 중</Button>',
+      'import { Spinner } from "./components/basic/spinner";\nimport { Button } from "./components/basic/button";\n\n<Spinner label="목록을 불러오는 중" />\n<Spinner variant="orbit" size="large" label="이미지를 준비하는 중" />\n<Button disabled><Spinner size="small" tone="inherit" isDecorative /> 처리 중</Button>',
     Demo: SpinnerDemo,
   }),
   entry({
@@ -865,7 +874,8 @@ export const basicEntries: CatalogEntry[] = [
     ],
     states: ["로딩", "콘텐츠 전환"],
     keyboard: ["포커스 대상 아님"],
-    usage: '<Skeleton width="60%" height={24} />',
+    usage:
+      'import { Skeleton } from "./components/basic/skeleton";\n\n<Skeleton width="60%" height={24} />',
     Demo: SkeletonDemo,
   }),
   entry({
@@ -893,7 +903,7 @@ export const basicEntries: CatalogEntry[] = [
     ],
     keyboard: ["포커스 대상 아님"],
     usage:
-      '<Progress label="파일 처리" value={progress} size="thick" />\n<Progress label="처리 중" size="thin" />',
+      'import { Progress } from "./components/basic/progress";\n\n<Progress label="파일 처리" value={progress} size="thick" />\n<Progress label="처리 중" size="thin" />',
     Demo: ProgressDemo,
   }),
   entry({
@@ -908,7 +918,7 @@ export const basicEntries: CatalogEntry[] = [
     states: ["로딩", "로드 완료", "로드 실패"],
     keyboard: ["포커스 대상 아님"],
     usage:
-      '<Image src={photo.url} alt={photo.description} aspectRatio="4 / 3" />',
+      'import { Image } from "./components/basic/image";\n\n<Image src={photo.url} alt={photo.description} aspectRatio="4 / 3" />',
     Demo: ImageDemo,
   }),
   entry({
@@ -922,7 +932,8 @@ export const basicEntries: CatalogEntry[] = [
     ],
     states: ["사진", "사진 없음", "실패", "크기 변경"],
     keyboard: ["포커스 대상 아님"],
-    usage: "<Avatar name={user.name} src={user.photoUrl} size={44} />",
+    usage:
+      'import { Avatar } from "./components/basic/avatar";\n\n<Avatar name={user.name} src={user.photoUrl} size={44} />',
     Demo: AvatarDemo,
   }),
   entry({
@@ -937,7 +948,7 @@ export const basicEntries: CatalogEntry[] = [
     states: ["본문", "헤더·푸터 포함", "내부 액션"],
     keyboard: ["내부 링크·버튼의 기본 조작"],
     usage:
-      '<Card title="프로젝트" footer={<Button onClick={save}>저장</Button>}>설명</Card>',
+      'import { Card } from "./components/basic/card";\nimport { Button } from "./components/basic/button";\n\n<Card title="프로젝트" footer={<Button onClick={save}>저장</Button>}>설명</Card>',
     Demo: CardDemo,
   }),
   entry({
@@ -956,7 +967,7 @@ export const basicEntries: CatalogEntry[] = [
       "내부 링크·버튼 조작",
     ],
     usage:
-      '<Table caption="프로젝트" headers={["이름", "상태"]} rows={projectRows} />',
+      'import { Table } from "./components/basic/table";\n\n<Table caption="프로젝트" headers={["이름", "상태"]} rows={projectRows} />',
     Demo: TableDemo,
   }),
   entry({
@@ -971,7 +982,7 @@ export const basicEntries: CatalogEntry[] = [
     states: ["처음", "중간", "마지막", "처리 중"],
     keyboard: ["Tab으로 버튼 이동", "Enter·Space로 페이지 요청"],
     usage:
-      "<Pagination page={page} totalPages={totalPages} onPageChange={loadPage} isLoading={isLoading} />",
+      'import { Pagination } from "./components/basic/pagination";\n\n<Pagination page={page} totalPages={totalPages} onPageChange={loadPage} isLoading={isLoading} />',
     Demo: PaginationDemo,
   }),
   entry({
@@ -986,7 +997,8 @@ export const basicEntries: CatalogEntry[] = [
     ],
     states: ["제목", "소제목", "본문", "보조"],
     keyboard: ["정적 텍스트"],
-    usage: '<Typography variant="heading">프로젝트 개요</Typography>',
+    usage:
+      'import { Typography } from "./components/basic/typography";\n\n<Typography variant="heading">프로젝트 개요</Typography>',
     Demo: TypographyDemo,
   }),
   entry({
@@ -1001,7 +1013,8 @@ export const basicEntries: CatalogEntry[] = [
     ],
     states: ["세로", "가로", "줄바꿈"],
     keyboard: ["내부 요소의 DOM 순서를 유지"],
-    usage: '<Stack direction="row" gap={16}>{actions}</Stack>',
+    usage:
+      'import { Stack } from "./components/basic/stack";\n\n<Stack direction="row" gap={16}>{actions}</Stack>',
     Demo: StackDemo,
   }),
   entry({
@@ -1016,7 +1029,8 @@ export const basicEntries: CatalogEntry[] = [
     ],
     states: ["다중 열", "단일 열"],
     keyboard: ["내부 요소의 DOM 순서를 유지"],
-    usage: "<Grid minWidth={180}>{cards}</Grid>",
+    usage:
+      'import { Grid } from "./components/basic/grid";\n\n<Grid minWidth={180}>{cards}</Grid>',
     Demo: GridDemo,
   }),
   entry({
@@ -1030,7 +1044,8 @@ export const basicEntries: CatalogEntry[] = [
     ],
     states: ["기본"],
     keyboard: ["포커스 대상 아님"],
-    usage: "<Divider />",
+    usage:
+      'import { Divider } from "./components/basic/divider";\n\n<Divider />',
     Demo: DividerDemo,
   }),
 ];

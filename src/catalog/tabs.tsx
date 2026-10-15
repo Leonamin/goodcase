@@ -247,6 +247,6 @@ export const tabsEntry: CatalogEntry = {
     "긴 한국어·disabled·320px·키보드 포커스·prefers-reduced-motion을 원본 데모와 비교합니다.",
   ],
   usage:
-    '<Tabs items={items} defaultValue="overview" />\n<Tabs variant="adaptive" label="작업 탭" items={items} value={tab} onValueChange={setTab} />\n// item: { value, label, content, icon?, badge?: number | "dot", badgeMax?: 99 | 999, isDisabled? }',
+    'import { Tabs } from "./components/overlays/tabs";\n\n<Tabs items={items} defaultValue="overview" />\n<Tabs variant="adaptive" label="작업 탭" items={items} value={tab} onValueChange={setTab} />\n// item: { value, label, content, icon?, badge?: number | "dot", badgeMax?: 99 | 999, isDisabled? }',
   Demo: TabsDemo,
 };

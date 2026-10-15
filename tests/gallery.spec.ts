@@ -369,9 +369,9 @@ test("source download includes transitive modules, styles and migration contract
   expect(path).not.toBeNull();
   const archive = unzipSync(await readFile(path!));
   for (const file of [
-    "src/components/composed/index.tsx",
-    "src/components/overlays/index.tsx",
-    "src/components/basic/index.tsx",
+    "src/components/composed/image-viewer.tsx",
+    "src/components/overlays/dialog.tsx",
+    "src/components/basic/button.tsx",
     "src/styles/tokens.css",
     "MIGRATION.md",
   ])

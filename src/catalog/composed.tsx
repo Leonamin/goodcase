@@ -390,130 +390,148 @@ function CopyDemo() {
     />
   );
 }
-const commonMigration = [
-  "src/components/composed/index.tsx에서 대상 컴포넌트와 관련 타입을 복사하거나 필요한 export만 추출합니다.",
-  "basic/Button과 overlays/Dialog 등 표시된 의존성을 함께 옮기고 import 경로를 맞춥니다.",
-  "src/styles/composed.css에서 대상 클래스와 공통 클래스만 가져오고 --gc-*를 프로젝트 토큰에 연결합니다.",
-  "데모 코드는 옮기지 않고 실제 데이터·API·파일 저장 동작을 콜백에 연결합니다.",
-  "키보드, 실패, 긴 한국어 콘텐츠, 좁은 화면 상태를 프로젝트에서 다시 확인합니다.",
-];
-function entry(
-  id: string,
-  name: string,
-  summary: string,
-  Demo: CatalogEntry["Demo"],
-  contracts: string[],
-  states: string[],
-  keyboard: string[],
-  usage: string,
-  dependencies: string[] = ["React 19", "basic/Button", "디자인 토큰 --gc-*"],
-): CatalogEntry {
+type Spec = Pick<
+  CatalogEntry,
+  | "id"
+  | "name"
+  | "summary"
+  | "Demo"
+  | "contracts"
+  | "states"
+  | "keyboard"
+  | "usage"
+  | "dependencies"
+>;
+
+function entry(spec: Spec): CatalogEntry {
+  const implementationFile = `src/components/composed/${spec.id}.tsx`;
   return {
-    id,
-    name,
+    ...spec,
     category: "composed",
-    summary,
-    Demo,
-    contracts,
-    states,
-    keyboard,
-    files: ["src/components/composed/index.tsx", "src/styles/composed.css"],
-    dependencies,
-    migration: commonMigration,
-    usage,
+    files: [
+      implementationFile,
+      "src/styles/composed.css",
+      "src/styles/tokens.css",
+    ],
+    dependencies: spec.dependencies,
+    migration: [
+      `${implementationFile}와 상대 import로 연결된 공용 컴포넌트·타입을 함께 가져옵니다.`,
+      "필요한 외부 패키지는 포함 파일의 import와 의존성 목록을 확인해 설치합니다.",
+      "src/styles/composed.css의 대상 클래스와 공통 스타일을 가져오고 --gc-*를 프로젝트 토큰에 연결합니다.",
+      "데모 코드는 옮기지 않고 실제 데이터·API·파일 저장 동작을 콜백에 연결합니다.",
+      "키보드, 실패, 긴 한국어 콘텐츠, 좁은 화면 상태를 프로젝트에서 다시 확인합니다.",
+    ],
   };
 }
 export const composedEntries: CatalogEntry[] = [
-  entry(
-    "form-field",
-    "FormField",
-    "입력의 이름, 설명, 필수 여부와 오류를 연결하는 공통 필드",
-    FieldDemo,
-    [
+  entry({
+    id: "form-field",
+    name: "FormField",
+    summary: "입력의 이름, 설명, 필수 여부와 오류를 연결하는 공통 필드",
+    Demo: FieldDemo,
+    contracts: [
       "고유 id로 label과 입력을 연결합니다.",
       "설명 또는 오류를 aria-describedby로 연결하고 오류가 설명보다 우선합니다.",
       "오류가 있으면 aria-invalid를 전달합니다. 실제 검증은 호출부가 담당합니다.",
     ],
-    ["기본", "필수", "설명", "30자 초과 오류"],
-    ["Tab으로 입력에 접근", "label 클릭으로 입력 포커스"],
-    '<FormField label="이름" error={error} isRequired>{props => <Input {...props} />}</FormField>',
-  ),
-  entry(
-    "form-actions",
-    "FormActions",
-    "중복 제출을 차단하고 실패 후 입력을 유지하는 폼 액션",
-    ActionsDemo,
-    [
+    states: ["기본", "필수", "설명", "30자 초과 오류"],
+    keyboard: ["Tab으로 입력에 접근", "label 클릭으로 입력 포커스"],
+    usage:
+      'import { FormField } from "./components/composed/form-field";\nimport { Input } from "./components/basic/input";\n\n<FormField label="이름" error={error} isRequired>{props => <Input {...props} />}</FormField>',
+    dependencies: ["react", "--gc-* 토큰"],
+  }),
+  entry({
+    id: "form-actions",
+    name: "FormActions",
+    summary: "중복 제출을 차단하고 실패 후 입력을 유지하는 폼 액션",
+    Demo: ActionsDemo,
+    contracts: [
       "submit 버튼은 폼 제출을 실행합니다. 저장 중 취소와 제출을 비활성화합니다.",
       "실패 메시지는 role=alert로 표시합니다. 입력 상태는 호출부가 소유합니다.",
       "중복 실행은 제출 핸들러에서도 ref 또는 요청 잠금으로 차단해야 합니다.",
       "취소 시 초기화 범위와 성공 후 이동은 호출부가 결정합니다.",
     ],
-    ["대기", "처리 중", "성공", "실패 후 입력 유지"],
-    ["Enter로 폼 제출", "Tab으로 취소·제출 이동"],
-    "<FormActions isSubmitting={isSubmitting} error={error} onCancel={reset} />",
-  ),
-  entry(
-    "confirm-dialog",
-    "ConfirmDialog",
-    "취소에서 시작하며 실패 시 열린 상태를 유지하는 확인 창",
-    ConfirmDemo,
-    [
+    states: ["대기", "처리 중", "성공", "실패 후 입력 유지"],
+    keyboard: ["Enter로 폼 제출", "Tab으로 취소·제출 이동"],
+    usage:
+      'import { FormActions } from "./components/composed/form-actions";\n\n<FormActions isSubmitting={isSubmitting} error={error} onCancel={reset} />',
+    dependencies: ["react", "src/components/basic/button.tsx", "--gc-* 토큰"],
+  }),
+  entry({
+    id: "confirm-dialog",
+    name: "ConfirmDialog",
+    summary: "취소에서 시작하며 실패 시 열린 상태를 유지하는 확인 창",
+    Demo: ConfirmDemo,
+    contracts: [
       "초기 포커스는 취소 버튼입니다.",
       "바깥 클릭으로 닫히지 않습니다. 처리 중 닫기 요청도 무시합니다.",
       "onConfirm Promise 성공 시 닫고 실패 시 내부 오류를 표시합니다.",
       "동기 ref로 중복 실행을 차단합니다. 실제 삭제는 외부 콜백에만 있습니다.",
     ],
-    ["닫힘", "확인", "처리 중", "오류", "완료"],
-    [
+    states: ["닫힘", "확인", "처리 중", "오류", "완료"],
+    keyboard: [
       "Tab 포커스 순환",
       "Escape로 닫기 (처리 중 제외)",
       "닫은 뒤 호출 버튼 포커스 복귀",
     ],
-    '<ConfirmDialog trigger={<Button>삭제</Button>} title="삭제할까요?" description="설명" onConfirm={deleteItem} />',
-    ["React 19", "basic/Button", "overlays/Dialog (Radix UI)", "--gc-* 토큰"],
-  ),
-  entry(
-    "search-filter-bar",
-    "SearchFilterBar",
-    "작성 중 조건과 실제 적용된 조건을 구분하는 검색 패널",
-    FilterDemo,
-    [
+    usage:
+      'import { ConfirmDialog } from "./components/composed/confirm-dialog";\nimport { Button } from "./components/basic/button";\n\n<ConfirmDialog trigger={<Button>삭제</Button>} title="삭제할까요?" description="설명" onConfirm={deleteItem} />',
+    dependencies: [
+      "react",
+      "src/components/overlays/dialog.tsx",
+      "src/components/basic/button.tsx",
+      "react-dom",
+      "radix-ui",
+      "lucide-react",
+      "--gc-* 토큰",
+    ],
+  }),
+  entry({
+    id: "search-filter-bar",
+    name: "SearchFilterBar",
+    summary: "작성 중 조건과 실제 적용된 조건을 구분하는 검색 패널",
+    Demo: FilterDemo,
+    contracts: [
       "입력 중 조건은 draft이며 Enter 또는 적용 버튼으로만 반영합니다.",
       "적용된 조건은 별도 요약으로 보여줍니다.",
       "초기화는 검색어와 상태 전체를 초기화하고 즉시 적용합니다.",
       "value 변경 시 draft를 동기화합니다. 프로젝트 필터 모델은 필요에 따라 확장합니다.",
     ],
-    ["미적용 입력", "적용", "조건 초기화", "외부 값 변경"],
-    [
+    states: ["미적용 입력", "적용", "조건 초기화", "외부 값 변경"],
+    keyboard: [
       "Enter로 적용",
       "Tab으로 필터·버튼 이동",
       "Select 방향키 탐색·Enter 확정·Escape 취소",
     ],
-    '<SearchFilterBar value={filters} onApply={setFilters} statusOptions={[{value:"all",label:"전체"}]} />',
-    [
-      "React 19",
-      "basic/Button·TextField",
-      "overlays/Select (Radix UI)",
+    usage:
+      'import { SearchFilterBar } from "./components/composed/search-filter-bar";\n\n<SearchFilterBar value={filters} onApply={setFilters} statusOptions={[{value:"all",label:"전체"}]} />',
+    dependencies: [
+      "react",
+      "src/components/basic/button.tsx",
+      "src/components/basic/text-field.tsx",
+      "src/components/overlays/select.tsx",
+      "react-dom",
+      "radix-ui",
+      "lucide-react",
       "--gc-* 토큰",
     ],
-  ),
-  entry(
-    "data-table",
-    "DataTable",
-    "정렬, 현재 페이지 선택, 상태 처리를 갖춘 데이터 목록",
-    TableDemo,
-    [
+  }),
+  entry({
+    id: "data-table",
+    name: "DataTable",
+    summary: "정렬, 현재 페이지 선택, 상태 처리를 갖춘 데이터 목록",
+    Demo: TableDemo,
+    contracts: [
       "안정적인 row.id로 선택 상태를 관리합니다.",
       "이름 정렬 변경 시 첫 페이지로 이동하고 선택을 해제합니다.",
       "전체 선택은 현재 페이지에만 적용되며 일부 선택 상태를 표시합니다.",
       "행·전체 선택은 공용 Checkbox를 사용하며 숨긴 라벨과 일부 선택 상태를 동일하게 지원합니다.",
-      "페이지 이동 또는 rows 변경 시 선택을 해제합니다.",
+      "페이지 이동 또는 rows 변경 시 선택을 해제합니다. pageSize 변경 시 첫 페이지로 돌아가고 선택을 해제합니다.",
       "최초 로딩·빈 결과·오류·재시도·기존 내용 유지 새로고침을 지원합니다.",
       "columns의 render/compare와 getRowId로 다른 데이터 모델에 이식합니다. isSortable/isSelectable 기본 true로 기능을 끌 수 있습니다.",
-      "기본 columns를 생략하면 id/name/status 모델을 사용합니다. 클라이언트 정렬·페이지네이션이며 서버형은 별도 확장이 필요합니다.",
+      "기본 DataRow(id/name/status) 모델은 columns/getRowId를 생략할 수 있습니다. 다른 행 모델은 columns와 getRowId를 함께 제공해야 하며 타입으로 확인합니다. 클라이언트 정렬·페이지네이션이며 서버형은 별도 확장이 필요합니다.",
     ],
-    [
+    states: [
       "로딩",
       "기본",
       "일부/전체 선택",
@@ -523,15 +541,24 @@ export const composedEntries: CatalogEntry[] = [
       "오류/재시도",
       "재조회",
     ],
-    ["Tab으로 정렬·선택·페이지 버튼 이동", "Space로 체크박스 선택"],
-    "<DataTable rows={rows} isLoading={isLoading} error={error} onRetry={reload} />",
-  ),
-  entry(
-    "file-uploader",
-    "FileUploader",
-    "파일 선택과 실제 업로드를 분리하고 파일별 실패를 복구",
-    UploadDemo,
-    [
+    keyboard: ["Tab으로 정렬·선택·페이지 버튼 이동", "Space로 체크박스 선택"],
+    usage:
+      'import { DataTable } from "./components/composed/data-table";\n\n<DataTable rows={rows} isLoading={isLoading} error={error} onRetry={reload} />',
+    dependencies: [
+      "react",
+      "src/components/basic/button.tsx",
+      "src/components/basic/checkbox.tsx",
+      "src/components/basic/pagination.tsx",
+      "src/components/composed/async-content.tsx",
+      "--gc-* 토큰",
+    ],
+  }),
+  entry({
+    id: "file-uploader",
+    name: "FileUploader",
+    summary: "파일 선택과 실제 업로드를 분리하고 파일별 실패를 복구",
+    Demo: UploadDemo,
+    contracts: [
       "기본 PNG/JPEG/SVG, 최대 3개·파일당 2MB를 선택 전에 검증합니다.",
       "선택·드롭은 업로드하지 않습니다. 명시적 업로드 버튼으로 시작합니다.",
       "보이는 파일 선택 액션은 공용 Button이며 숨긴 native file 입력이 운영체제 파일 선택기를 엽니다.",
@@ -539,7 +566,7 @@ export const composedEntries: CatalogEntry[] = [
       "제거·unmount 시 AbortSignal로 요청 취소를 전달합니다.",
       "onUpload 외부 어댑터가 실제 저장을 수행하며 서버에서도 파일 검증이 필요합니다.",
     ],
-    [
+    states: [
       "선택 전",
       "선택됨",
       "검증 오류",
@@ -548,15 +575,25 @@ export const composedEntries: CatalogEntry[] = [
       "실패/재시도",
       "취소",
     ],
-    ["Tab으로 파일 선택·업로드·제거 접근", "네이티브 파일 선택창 사용"],
-    "<FileUploader onUpload={async (file, {signal,onProgress}) => upload(file, signal, onProgress)} />",
-  ),
-  entry(
-    "image-viewer",
-    "ImageViewer",
-    "어두운 전체 화면과 썸네일 탐색을 갖춘 이미지 뷰어",
-    ViewerDemo,
-    [
+    keyboard: [
+      "Tab으로 파일 선택·업로드·제거 접근",
+      "네이티브 파일 선택창 사용",
+    ],
+    usage:
+      'import { FileUploader } from "./components/composed/file-uploader";\n\n<FileUploader onUpload={async (file, {signal,onProgress}) => upload(file, signal, onProgress)} />',
+    dependencies: [
+      "react",
+      "src/components/basic/button.tsx",
+      "src/components/basic/progress.tsx",
+      "--gc-* 토큰",
+    ],
+  }),
+  entry({
+    id: "image-viewer",
+    name: "ImageViewer",
+    summary: "어두운 전체 화면과 썸네일 탐색을 갖춘 이미지 뷰어",
+    Demo: ViewerDemo,
+    contracts: [
       "열기·이미지 변경 시 100% 화면 맞춤과 이동 초기화입니다.",
       "이미지를 두 번 탭하면 기본 배율에서 탭한 이미지 지점을 기준으로 200% 확대합니다. 확대 상태의 두 번 탭은 100% 화면 맞춤으로 초기화합니다. 이동 경계에서 초점을 제한합니다.",
       "터치·펜에서 250ms 이하의 탭 두 번을 300ms·32px 이내로 인식합니다. 이미지 탭만 포함하며 드래그·스와이프·핀치·긴 누름·컨트롤 입력은 탭 기록에서 제외합니다.",
@@ -574,7 +611,7 @@ export const composedEntries: CatalogEntry[] = [
       "닫기는 실제 빈 공간에서 시작하고 끝난 탭만 처리합니다. 컨트롤에서 시작한 입력과 짧은 드래그는 닫기에서 제외합니다.",
       "모달 포커스 관리와 닫기 후 호출 요소 복귀를 유지합니다.",
     ],
-    [
+    states: [
       "닫힘",
       "로딩",
       "표시",
@@ -590,79 +627,112 @@ export const composedEntries: CatalogEntry[] = [
       "스와이프·짧은 제스처 복귀",
       "스와이프 놓기 보정 켜기·끄기",
     ],
-    [
+    keyboard: [
       "좌우 키로 이미지 이동",
       "확대 후 Shift+방향키로 이미지 이동",
       "Escape 닫기",
       "Tab으로 확대·초기화 접근",
     ],
-    "<ImageViewer images={images} index={index} onIndexChange={setIndex} isOpen={isOpen} onOpenChange={setIsOpen} isAnimated={true} trigger={<Button>보기</Button>} />",
-    [
-      "React 19",
-      "basic/Button",
-      "overlays/Dialog (Radix UI)",
+    usage:
+      'import { ImageViewer } from "./components/composed/image-viewer";\nimport { Button } from "./components/basic/button";\n\n<ImageViewer images={images} index={index} onIndexChange={setIndex} isOpen={isOpen} onOpenChange={setIsOpen} isAnimated={true} trigger={<Button>보기</Button>} />',
+    dependencies: [
+      "react",
+      "src/components/overlays/dialog.tsx",
+      "src/components/basic/button.tsx",
+      "src/components/composed/gallery-image.tsx",
+      "src/components/composed/use-viewer-gesture.ts",
+      "src/components/composed/viewer-image.ts",
+      "react-dom",
+      "radix-ui",
+      "lucide-react",
       "ResizeObserver",
       "--gc-* 토큰",
     ],
-  ),
-  entry(
-    "image-gallery",
-    "ImageGallery",
-    "썸네일에서 선택한 이미지로 뷰어를 여는 갤러리",
-    GalleryDemo,
-    [
+  }),
+  entry({
+    id: "image-gallery",
+    name: "ImageGallery",
+    summary: "썸네일에서 선택한 이미지로 뷰어를 여는 갤러리",
+    Demo: GalleryDemo,
+    contracts: [
       "썸네일 선택 시 해당 index부터 ImageViewer를 엽니다.",
       "4:3 썸네일과 반응형 그리드를 유지합니다.",
       "썸네일 로딩 실패는 개별 fallback으로 처리합니다.",
       "닫기 후 실제 선택한 썸네일로 포커스를 돌립니다.",
       "이미지 대체 텍스트는 데이터에서 전달합니다.",
     ],
-    ["그리드", "모바일 2열", "이미지 실패", "동일 ID 새 src 복구", "뷰어 열림"],
-    ["Tab으로 썸네일 탐색", "Enter/Space로 열기", "Escape 닫기"],
-    '<ImageGallery images={[{id:"1", src:"/image.jpg", alt:"이미지 설명"}]} />',
-    [
-      "React 19",
-      "basic/Button",
-      "ImageViewer",
-      "overlays/Dialog (Radix UI)",
+    states: [
+      "그리드",
+      "모바일 2열",
+      "이미지 실패",
+      "동일 ID 새 src 복구",
+      "뷰어 열림",
+    ],
+    keyboard: ["Tab으로 썸네일 탐색", "Enter/Space로 열기", "Escape 닫기"],
+    usage:
+      'import { ImageGallery } from "./components/composed/image-gallery";\n\n<ImageGallery images={[{id:"1", src:"/image.jpg", alt:"이미지 설명"}]} />',
+    dependencies: [
+      "react",
+      "src/components/basic/button.tsx",
+      "src/components/composed/image-viewer.tsx",
+      "src/components/composed/gallery-image.tsx",
+      "react-dom",
+      "radix-ui",
+      "lucide-react",
       "--gc-* 토큰",
     ],
-  ),
-  entry(
-    "async-content",
-    "AsyncContent",
-    "최초 로딩과 기존 콘텐츠 재조회를 구분하는 상태 경계",
-    AsyncDemo,
-    [
+  }),
+  entry({
+    id: "async-content",
+    name: "AsyncContent",
+    summary: "최초 로딩과 기존 콘텐츠 재조회를 구분하는 상태 경계",
+    Demo: AsyncDemo,
+    contracts: [
       "최초 isLoading이면 스켈레톤과 상태 안내를 표시합니다.",
       "isRefreshing은 기존 children을 유지하며 aria-busy를 전달합니다.",
       "빈 결과와 데이터 없는 오류를 구분하고 오류에는 재시도를 제공합니다.",
       "기존 콘텐츠가 있으면 재조회 오류도 콘텐츠 위에 표시합니다.",
       "조회·취소·경쟁 요청 처리는 외부 데이터 계층에서 담당합니다.",
     ],
-    ["최초 로딩", "콘텐츠", "빈 상태", "오류", "재조회", "콘텐츠 유지 오류"],
-    ["Tab으로 재시도 접근"],
-    "<AsyncContent isLoading={isLoading} isRefreshing={isRefreshing} isEmpty={!data.length} error={error} onRetry={reload}>{content}</AsyncContent>",
-  ),
-  entry(
-    "copy-field",
-    "CopyField",
-    "표시된 전체 원본값을 실제 클립보드에 복사",
-    CopyDemo,
-    [
+    states: [
+      "최초 로딩",
+      "콘텐츠",
+      "빈 상태",
+      "오류",
+      "재조회",
+      "콘텐츠 유지 오류",
+    ],
+    keyboard: ["Tab으로 재시도 접근"],
+    usage:
+      'import { AsyncContent } from "./components/composed/async-content";\n\n<AsyncContent isLoading={isLoading} isRefreshing={isRefreshing} isEmpty={!data.length} error={error} onRetry={reload}>{content}</AsyncContent>',
+    dependencies: [
+      "react",
+      "src/components/basic/button.tsx",
+      "src/components/basic/skeleton.tsx",
+      "--gc-* 토큰",
+    ],
+  }),
+  entry({
+    id: "copy-field",
+    name: "CopyField",
+    summary: "표시된 전체 원본값을 실제 클립보드에 복사",
+    Demo: CopyDemo,
+    contracts: [
       "navigator.clipboard.writeText가 성공한 뒤에만 성공을 표시합니다.",
       "실패 시 직접 선택·복사할 수 있는 안내를 제공합니다.",
       "읽기 전용 input으로 전체 원본값을 선택할 수 있습니다.",
       "처리 중 중복 복사를 차단하고 이후 반복 복사를 허용합니다.",
     ],
-    ["기본", "긴 값", "복사 중", "성공", "권한 실패"],
-    ["Tab으로 값·복사 버튼 접근", "입력에서 전체 선택하여 수동 복사"],
-    '<CopyField label="식별자" value={id} />',
-    [
-      "React 19",
-      "basic/Button",
+    states: ["기본", "긴 값", "복사 중", "성공", "권한 실패"],
+    keyboard: ["Tab으로 값·복사 버튼 접근", "입력에서 전체 선택하여 수동 복사"],
+    usage:
+      'import { CopyField } from "./components/composed/copy-field";\n\n<CopyField label="식별자" value={id} />',
+    dependencies: [
+      "react",
+      "src/components/basic/button.tsx",
+      "src/components/basic/text-field.tsx",
       "Clipboard API (HTTPS 또는 localhost)",
       "--gc-* 토큰",
     ],
-  ),
+  }),
 ];
