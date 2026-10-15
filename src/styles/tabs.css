@@ -145,6 +145,10 @@
 .gc-tabs-underline .gc-tabs-trigger {
   border-radius: var(--gc-radius-sm) var(--gc-radius-sm) 0 0;
 }
+.gc-tabs-underline .gc-tabs-indicator {
+  /* Keep the underline above hovered and focused trigger backgrounds. */
+  z-index: 3;
+}
 .gc-tabs-underline .gc-tabs-indicator:after {
   content: "";
   position: absolute;

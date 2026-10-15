@@ -2,7 +2,7 @@
   "generator": "goodcase/build-skill/v1",
   "name": "use-goodcase-ui",
   "version": "0.1.0",
-  "contentHash": "98fd9e12680840d2236a819392cf6da605492a8bf159dc5b97837fc1fbb4e032",
+  "contentHash": "a08e22e162b18870e5358944eccd886370c6e97ae05f16e2d4235c3cce4390d3",
   "componentCount": 44,
   "packageVersions": {
     "lucide-react": "^0.468.0",
@@ -69,7 +69,7 @@
     "assets/src/styles/composed.css": "ec6f50b463fc318d0caa7bf8fb1cd9825f3a2b1833f67e037cd4ee6d9834a7d0",
     "assets/src/styles/global.css": "84412012e99a87e6bade34b46ab9d76356c9aa824d01bf24461ddf242e0f554e",
     "assets/src/styles/overlays.css": "da0fb0c5162c438d3b71b90e546aac26984cdcee9326b62d083ea0e1cd49df98",
-    "assets/src/styles/tabs.css": "93e3a92ddb748962580623ed6eca81e095c0fd4534ec12432574f21a48eec1a7",
+    "assets/src/styles/tabs.css": "ddf659c5dcb240cf86f3cf53f1fdda6aff8912d394e612b1614a5011e2bd41ba",
     "assets/src/styles/toast.css": "60c63abe10d70c236e18f80f4b36af7ce00ea35ce99fcc9549f9d1b2f93b755e",
     "assets/src/styles/tokens.css": "8d70d5d73e8248fa97bda9800f63f3954bfcfb9c873ec85adc06ec4cea73cee7",
     "references/components.json": "90a6531c26ad225f780c1a58e5a37130cb68464e7ecc9708e032454fc1c67903",
