@@ -269,20 +269,16 @@
   flex-wrap: wrap;
   min-width: 0;
 }
+.preview-toolbar .gc-overlay-field {
+  width: auto;
+}
 .preview-toolbar label {
   display: grid;
   gap: var(--gc-space-2);
   font-size: 11px;
   color: var(--gc-text-muted);
 }
-.preview-toolbar select {
-  min-height: var(--gc-control-height);
-  border: 1px solid var(--gc-border);
-  background: var(--gc-surface);
-  border-radius: var(--gc-radius);
-  padding: var(--gc-space-2) var(--gc-space-3);
-  color: var(--gc-text);
-  font-size: var(--gc-text-sm);
+.preview-toolbar .gc-select {
   max-width: 100%;
 }
 .reset-button {
@@ -398,7 +394,7 @@
   padding: 14px 20px;
   border-bottom: 1px solid var(--gc-border);
 }
-.source-toolbar label {
+.source-toolbar > .gc-overlay-field {
   white-space: nowrap;
   display: flex;
   align-items: center;
@@ -406,17 +402,11 @@
   font-size: 12px;
   min-width: 0;
   flex: 1;
+  width: auto;
 }
-.source-toolbar select {
+.source-toolbar .gc-select {
   min-width: 0;
   width: 100%;
-  border: 1px solid var(--gc-border);
-  border-radius: var(--gc-radius-sm);
-  padding: var(--gc-space-2) var(--gc-space-3);
-  min-height: var(--gc-control-height);
-  background: var(--gc-surface);
-  font-size: 12px;
-  color: var(--gc-text);
 }
 .source-toolbar > .gc-button {
   flex-shrink: 0;
@@ -565,8 +555,8 @@
   .reset-button,
   .download-button,
   .source-toolbar > .gc-button,
-  .preview-toolbar select,
-  .source-toolbar select,
+  .preview-toolbar .gc-select,
+  .source-toolbar .gc-select,
   .gallery-search .gc-input {
     min-height: 44px;
   }
@@ -585,7 +575,7 @@
     grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr);
     gap: var(--gc-space-2);
   }
-  .preview-toolbar select {
+  .preview-toolbar .gc-select {
     width: 100%;
     min-width: 0;
     padding: var(--gc-space-2);
@@ -615,7 +605,7 @@
     flex-wrap: wrap;
     padding: var(--gc-space-4);
   }
-  .source-toolbar label {
+  .source-toolbar > .gc-overlay-field {
     flex-basis: 100%;
   }
   .source-panel pre {
@@ -627,7 +617,7 @@
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: var(--gc-space-3);
   }
-  .preview-toolbar label:first-child {
+  .preview-toolbar .gc-overlay-field:first-child {
     grid-column: 1 / -1;
   }
   .document-panel {

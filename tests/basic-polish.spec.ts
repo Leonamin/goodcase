@@ -1,3 +1,4 @@
+import { selectOption } from "./helpers/select-option";
 import { test, expect } from "@playwright/test";
 
 // User-approved relationships (2026-10-14): square centred icon controls,
@@ -24,7 +25,7 @@ test("Lucide icon buttons are square and geometrically centred at both densities
   await page.goto("/?component=button");
   const button = page.getByRole("button", { name: "즐겨찾기", exact: true });
   for (const density of ["comfortable", "compact"]) {
-    await page.getByLabel("밀도", { exact: true }).selectOption(density);
+    await selectOption(page.getByLabel("밀도", { exact: true }), density);
     const actual = await iconGeometry(button);
     expect(actual.width).toBe(actual.height);
     expect(isCentered(actual), JSON.stringify(actual)).toBe(true);

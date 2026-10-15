@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "../components/basic";
+import { Select } from "../components/overlays";
 import {
   ToastProvider,
   ToastPreview,
@@ -33,72 +34,63 @@ function ToastDemoContent({
   return (
     <div className="gc-toast-demo">
       <div className="gc-toast-demo-controls">
-        <label>
-          알림 배치
-          <select
-            value={layout}
-            onChange={(e) => onLayoutChange(e.target.value as "list" | "stack")}
-          >
-            <option value="list">목록</option>
-            <option value="stack">겹침 스택</option>
-          </select>
-        </label>
-        <label>
-          스택 표시 개수
-          <select
-            value={stackSize}
-            onChange={(e) => onStackSizeChange(Number(e.target.value))}
-          >
-            <option value={2}>2개</option>
-            <option value={3}>3개</option>
-            <option value={5}>5개</option>
-          </select>
-        </label>
-        <label>
-          진입 방향
-          <select
-            value={direction}
-            onChange={(e) => onDirectionChange(e.target.value as "up" | "down")}
-          >
-            <option value="up">아래에서 위 · 화면 하단</option>
-            <option value="down">위에서 아래 · 화면 상단</option>
-          </select>
-        </label>
-        <label>
-          타이머 표현
-          <select
-            value={timer}
-            onChange={(event) => setTimer(event.target.value as typeof timer)}
-          >
-            <option value="bar">하단 바</option>
-            <option value="circle">닫기 버튼 원형</option>
-            <option value="none">표현 없음</option>
-          </select>
-        </label>
-        <label>
-          알림 배경
-          <select
-            value={appearance}
-            onChange={(event) =>
-              setAppearance(event.target.value as typeof appearance)
-            }
-          >
-            <option value="surface">테마 표면 · 기본</option>
-            <option value="tinted">옅은 상태색</option>
-            <option value="solid">진한 상태색</option>
-          </select>
-        </label>
-        <label>
-          자동 닫힘 시간
-          <select
-            value={durationMs}
-            onChange={(event) => setDurationMs(Number(event.target.value))}
-          >
-            <option value={5000}>5초 · 기본</option>
-            <option value={1500}>1.5초 · 빠른 확인</option>
-            <option value={10000}>10초</option>
-          </select>
-        </label>
+        <Select
+          label="알림 배치"
+          value={layout}
+          onValueChange={(next) => onLayoutChange(next as "list" | "stack")}
+          options={[
+            { value: "list", label: "목록" },
+            { value: "stack", label: "겹침 스택" },
+          ]}
+        />
+        <Select
+          label="스택 표시 개수"
+          value={String(stackSize)}
+          onValueChange={(next) => onStackSizeChange(Number(next))}
+          options={[2, 3, 5].map((value) => ({
+            value: String(value),
+            label: `${value}개`,
+          }))}
+        />
+        <Select
+          label="진입 방향"
+          value={direction}
+          onValueChange={(next) => onDirectionChange(next as "up" | "down")}
+          options={[
+            { value: "up", label: "아래에서 위 · 화면 하단" },
+            { value: "down", label: "위에서 아래 · 화면 상단" },
+          ]}
+        />
+        <Select
+          label="타이머 표현"
+          value={timer}
+          onValueChange={(next) => setTimer(next as typeof timer)}
+          options={[
+            { value: "bar", label: "하단 바" },
+            { value: "circle", label: "닫기 버튼 원형" },
+            { value: "none", label: "표현 없음" },
+          ]}
+        />
+        <Select
+          label="알림 배경"
+          value={appearance}
+          onValueChange={(next) => setAppearance(next as typeof appearance)}
+          options={[
+            { value: "surface", label: "테마 표면 · 기본" },
+            { value: "tinted", label: "옅은 상태색" },
+            { value: "solid", label: "진한 상태색" },
+          ]}
+        />
+        <Select
+          label="자동 닫힘 시간"
+          value={String(durationMs)}
+          onValueChange={(next) => setDurationMs(Number(next))}
+          options={[
+            { value: "5000", label: "5초 · 기본" },
+            { value: "1500", label: "1.5초 · 빠른 확인" },
+            { value: "10000", label: "10초" },
+          ]}
+        />
       </div>
       <div className="gc-actions">
         <Button
@@ -253,9 +245,9 @@ export const toastEntry: CatalogEntry = {
     "timer는 bar/circle/none을 지원합니다. none은 시각적 표현만 숨기며 자동 닫힘은 동일합니다.",
     "info/success/warning은 기본 5초 후 닫힙니다. error 또는 action이 있으면 기본은 수동 닫기이며 가짜 타이머를 표시하지 않습니다.",
     "durationMs를 양수로 지정하면 오류·액션도 명시적으로 자동 닫힘을 선택합니다. 0·음수·Infinity는 지속 알림입니다.",
-    "performance.now 기반 단일 시계와 종료 setTimeout이 남은 시간을 관리합니다. WAAPI 애니메이션을 같은 시계의 currentTime에 맞춰 동기화하며 프레임마다 React를 갱신하지 않습니다. 접근성 남은 시간은 DOM에서 1초마다 갱신합니다. 모션 감소 설정에서는 같은 간격으로 시각적 남은 시간도 갱신합니다.",
+    "performance.now 기반 단일 시계와 자동 닫힘 setTimeout이 남은 시간을 관리합니다. WAAPI 애니메이션을 같은 시계의 currentTime에 맞춰 동기화하며 프레임마다 React를 갱신하지 않습니다. 접근성 남은 시간은 DOM에서 1초마다 갱신합니다. 모션 감소 설정에서는 같은 간격으로 시각적 남은 시간도 갱신합니다.",
     "개별 카드의 호버·내부 포커스만 그 카드의 시간을 일시정지합니다. document.hidden은 모든 카드에 적용합니다. 목록 전체 호버는 다른 카드의 시간을 멈추지 않습니다.",
-    "stack은 목록 호버 또는 키보드 포커스로 펼쳐집니다. 접힌 뒤쪽 카드는 inert/aria-hidden이며 읽기 전 시간도 일시정지합니다. 펼치기 자체는 다른 카드의 타이머를 멈추지 않습니다. up은 화면 하단에서 아래→위 진입, down은 화면 상단에서 위→아래 진입입니다. 닫기는 오른쪽으로 180ms 이동하며 퇴장 완료 후 제거합니다. 모션 감소 설정은 즉시 닫습니다. 알림 생성은 포커스를 가져가지 않습니다. 닫기 버튼은 항상 접근 가능하며 원형은 호버·포커스 때 X를 보여줍니다. 터치에서는 X를 유지합니다.",
+    "stack은 목록 호버 또는 키보드 포커스로 펼쳐집니다. 접힌 뒤쪽 카드는 inert/aria-hidden이며 읽기 전 시간도 일시정지합니다. 펼치기 자체는 다른 카드의 타이머를 멈추지 않습니다. up은 화면 하단에서 아래→위 진입, down은 화면 상단에서 위→아래 진입입니다. 닫기는 오른쪽으로 이동하며 기본 180ms인 --gc-toast-exit-duration으로 속도를 지정합니다. JavaScript의 별도 지연 시간 없이 실제 CSS 퇴장 애니메이션이 끝난 뒤 제거하며 animation:none도 지원합니다. 모션 감소 설정은 즉시 닫습니다. 알림 생성은 포커스를 가져가지 않습니다. 닫기 버튼은 항상 접근 가능하며 원형은 호버·포커스 때 X를 보여줍니다. 터치에서는 X를 유지합니다.",
     "여러 알림은 안정적인 UUID로 관리합니다. list는 전체 목록, stack은 먼저 도착한 N개만 표시하고 나머지는 FIFO 대기열로 보존하며 대기 개수 안내는 표시하지 않습니다. 카드 제거 후 남은 카드는 현재 화면 위치에서 220ms 동안 빈자리로 이동합니다. 모션 감소 설정에서는 즉시 재배치합니다.",
   ],
   states: [
@@ -284,7 +276,7 @@ export const toastEntry: CatalogEntry = {
   files: [
     "src/components/overlays/toast.tsx",
     "src/styles/toast.css",
-    "src/components/basic/index.tsx",
+    "src/styles/tokens.css",
   ],
   dependencies: [
     "React 19",
@@ -302,5 +294,5 @@ export const toastEntry: CatalogEntry = {
     "갤러리의 정적 ToastPreview와 실제 notify 예제를 구분합니다. 업무 API는 알림 내부에 연결하지 않습니다.",
   ],
   usage:
-    'notify({ title: "저장했습니다", tone: "success", timer: "circle", appearance: "surface" });\nnotify({ title: "저장 실패", tone: "error", action: { label: "재시도", onClick: retry } });',
+    'import { useToast } from "./components/overlays/toast";\n\n// ToastProvider 내부 컴포넌트에서 사용\nconst { notify } = useToast();\nnotify({ title: "저장했습니다", tone: "success", timer: "circle", appearance: "surface" });\nnotify({ title: "저장 실패", tone: "error", action: { label: "재시도", onClick: retry } });',
 };

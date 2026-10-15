@@ -72,6 +72,21 @@ test("generated skill is portable, complete, reproducible, and protects manual e
     }
     assert.match(files.get("references/components/tabs.md"), /Enter.*Space/);
     assert.match(files.get("references/components/toast.md"), /FIFO/);
+    const fieldReference = files.get("references/components/form-field.md");
+    assert.match(
+      fieldReference,
+      /assets\/src\/components\/composed\/form-field\.tsx/,
+    );
+    assert.doesNotMatch(
+      fieldReference,
+      /radix-ui|lucide-react|overlays\/|basic\.css|toast\.css/,
+    );
+    const spinnerReference = files.get("references/components/spinner.md");
+    assert.match(spinnerReference, /react, react-dom/);
+    assert.doesNotMatch(
+      spinnerReference,
+      /lucide-react|radix-ui|composed\.css|toast\.css/,
+    );
 
     const output = path.join(temporary, "generated");
     const archive = path.join(temporary, "skill.zip");

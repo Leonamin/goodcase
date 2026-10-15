@@ -61,6 +61,7 @@ export const foundationEntries: CatalogEntry[] = [
       "--gc-* 의미 토큰을 프로젝트 변수에 연결해 외형을 변경합니다.",
       "Portal 콘텐츠도 같은 토큰을 읽도록 문서 범위 또는 Portal 컨테이너에 테마를 공급합니다.",
       "테마와 밀도는 동작을 바꾸지 않습니다.",
+      "Blue·Forest는 강조색만 바꾸고 모서리 반경을 유지합니다. 모서리는 --gc-radius-*로 별도 조정합니다.",
     ],
     states: [
       "Blue 기본 테마",
@@ -70,7 +71,9 @@ export const foundationEntries: CatalogEntry[] = [
       "기본 밀도",
       "조밀한 밀도",
     ],
-    keyboard: ["테마·밀도 선택은 네이티브 select로 조작합니다."],
+    keyboard: [
+      "테마·색상 모드·밀도는 공용 Select로 조작합니다. 방향키로 탐색하고 Enter로 확정하며 Escape로 취소합니다.",
+    ],
     files: ["src/styles/tokens.css"],
     dependencies: ["CSS custom properties"],
     migration: [

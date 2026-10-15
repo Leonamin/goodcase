@@ -20,6 +20,8 @@ export const TextField: StoryObj = {
   render: () => renderExample("text-field"),
 };
 export const TextArea: StoryObj = { render: () => renderExample("text-area") };
+export const Stepper: StoryObj = { render: () => renderExample("stepper") };
+export const Slider: StoryObj = { render: () => renderExample("slider") };
 export const Checkbox: StoryObj = { render: () => renderExample("checkbox") };
 export const RadioGroup: StoryObj = {
   render: () => renderExample("radio-group"),
@@ -28,6 +30,7 @@ export const Switch: StoryObj = { render: () => renderExample("switch") };
 export const Badge: StoryObj = { render: () => renderExample("badge") };
 export const Alert: StoryObj = { render: () => renderExample("alert") };
 export const Skeleton: StoryObj = { render: () => renderExample("skeleton") };
+export const Spinner: StoryObj = { render: () => renderExample("spinner") };
 export const Progress: StoryObj = { render: () => renderExample("progress") };
 export const Image: StoryObj = { render: () => renderExample("image") };
 export const Avatar: StoryObj = { render: () => renderExample("avatar") };

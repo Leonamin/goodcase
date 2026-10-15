@@ -16,7 +16,7 @@ function ButtonDemo() {
           onClick={() => {
             setIsLoading(true);
             timer.current = setTimeout(() => {
-              setCount(count + 1);
+              setCount((previous) => previous + 1);
               setIsLoading(false);
             }, 900);
           }}
@@ -31,21 +31,24 @@ function ButtonDemo() {
         아이콘 버튼 · 기본 ghost / 표면이 있는 filled / 비활성
       </B.Typography>
       <div className="gc-demo-row">
-        <B.IconButton label="즐겨찾기" onClick={() => setCount(count + 1)}>
+        <B.IconButton
+          label="즐겨찾기"
+          onClick={() => setCount((previous) => previous + 1)}
+        >
           <Star size={20} aria-hidden="true" />
         </B.IconButton>
         <B.IconButton
           label="메뉴 열기"
           appearance="filled"
           variant="secondary"
-          onClick={() => setCount(count + 1)}
+          onClick={() => setCount((previous) => previous + 1)}
         >
           <Menu size={20} aria-hidden="true" />
         </B.IconButton>
         <B.IconButton
           label="설정 열기"
           appearance="filled"
-          onClick={() => setCount(count + 1)}
+          onClick={() => setCount((previous) => previous + 1)}
         >
           <Settings size={20} aria-hidden="true" />
         </B.IconButton>
@@ -60,7 +63,7 @@ function ButtonDemo() {
         <B.IconButton
           label="작은 즐겨찾기"
           size="compact"
-          onClick={() => setCount(count + 1)}
+          onClick={() => setCount((previous) => previous + 1)}
         >
           <Star size={16} aria-hidden="true" />
         </B.IconButton>
@@ -69,7 +72,7 @@ function ButtonDemo() {
           size="compact"
           appearance="filled"
           variant="secondary"
-          onClick={() => setCount(count + 1)}
+          onClick={() => setCount((previous) => previous + 1)}
         >
           <Settings size={16} aria-hidden="true" />
         </B.IconButton>
@@ -112,9 +115,80 @@ function TextFieldDemo() {
       />
       <B.TextField label="읽기 전용" value="goodcase-reference" readOnly />
       <B.TextField label="비활성 입력" defaultValue="변경 권한 없음" disabled />
+      <B.TextField
+        label="숫자 입력"
+        type="number"
+        min={0}
+        defaultValue={12}
+        description="기본 증감 화살표 없이 숫자를 입력합니다."
+      />
     </div>
   );
 }
+function StepperDemo() {
+  const [quantity, setQuantity] = useState(1);
+  const [amount, setAmount] = useState(0.5);
+  return (
+    <div className="gc-basic-demo">
+      <B.Stepper
+        label="수량"
+        value={quantity}
+        onValueChange={setQuantity}
+        min={0}
+        max={10}
+        description="0~10개 · 버튼 또는 직접 입력으로 조절합니다."
+      />
+      <B.Stepper
+        label="소수 단위"
+        value={amount}
+        onValueChange={setAmount}
+        min={0}
+        max={2}
+        step={0.1}
+        description="0.1 단위 · 입력 후 Enter 또는 포커스 이동으로 확정합니다."
+      />
+      <div className="gc-demo-row">
+        <B.Stepper
+          label="읽기 전용 수량"
+          value={4}
+          onValueChange={() => {}}
+          isReadOnly
+        />
+        <B.Stepper
+          label="비활성 수량"
+          value={2}
+          onValueChange={() => {}}
+          isDisabled
+        />
+      </div>
+      <B.Typography variant="caption">
+        선택한 수량 {quantity}개 · 소수 값 {amount}
+      </B.Typography>
+    </div>
+  );
+}
+
+function SliderDemo() {
+  const [value, setValue] = useState(35);
+  return (
+    <div className="gc-basic-demo">
+      <B.Slider
+        label="볼륨"
+        value={value}
+        onValueChange={setValue}
+        valueText={`${value}%`}
+        description="방향키 또는 트랙을 눌러 조절합니다."
+      />
+      <B.Slider
+        label="비활성 범위"
+        value={60}
+        onValueChange={() => {}}
+        isDisabled
+      />
+    </div>
+  );
+}
+
 function TextAreaDemo() {
   const [value, setValue] = useState("");
   return (
@@ -230,6 +304,72 @@ function AlertDemo() {
     </div>
   );
 }
+function SpinnerDemo() {
+  return (
+    <div className="gc-spinner-demo">
+      <div className="gc-spinner-demo-variants">
+        {(
+          [
+            {
+              variant: "ring",
+              title: "Ring · 원형 선",
+              note: "둥근 끝의 원형 선이 일정한 속도로 회전합니다.",
+              label: "원형 선 스피너",
+            },
+            {
+              variant: "orbit",
+              title: "Orbit · 여러 원의 공전",
+              note: "작은 원 4개가 1.2·1.6·2.1·2.7초 주기로 각각 회전합니다.",
+              label: "다중 원 스피너",
+            },
+          ] as const
+        ).map(({ variant, title, note, label }) => (
+          <section key={variant} className="gc-spinner-demo-variant">
+            <h2>{title}</h2>
+            <p className="gc-muted">{note}</p>
+            <B.Spinner variant={variant} size="large" label={label} />
+            <div
+              className="gc-spinner-demo-samples"
+              aria-label={`${title} 크기 비교`}
+            >
+              {(["small", "medium", "large"] as const).map((size) => (
+                <div key={size} className="gc-stack">
+                  <B.Spinner
+                    variant={variant}
+                    size={size}
+                    tone="muted"
+                    isDecorative
+                  />
+                  <span className="gc-muted">
+                    {size === "small"
+                      ? "16px"
+                      : size === "medium"
+                        ? "32px"
+                        : "48px"}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <B.Button disabled>
+              <B.Spinner
+                variant={variant}
+                size="small"
+                tone="inherit"
+                isDecorative
+              />{" "}
+              처리 중
+            </B.Button>
+          </section>
+        ))}
+      </div>
+      <p className="gc-muted">
+        진행률을 계산하지 않는 로딩 표시입니다. 버튼 안에서는 장식형으로
+        사용하며, 모션 감소 설정에서는 회전을 멈춥니다.
+      </p>
+    </div>
+  );
+}
+
 function SkeletonDemo() {
   const [isLoading, setIsLoading] = useState(true);
   return (
@@ -260,16 +400,12 @@ function ProgressDemo() {
   const [value, setValue] = useState(35);
   return (
     <div className="gc-basic-demo">
-      <label className="gc-progress-range">
-        진행률 조절 · {value}%{" "}
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={value}
-          onChange={(e) => setValue(Number(e.target.value))}
-        />
-      </label>
+      <B.Slider
+        label="진행률 조절"
+        value={value}
+        onValueChange={setValue}
+        valueText={`${value}%`}
+      />
       <B.Progress label="얇게 · 8px" value={value} size="thin" />
       <B.Progress label="기본 · 14px" value={value} />
       <B.Progress
@@ -316,7 +452,10 @@ function CardDemo() {
       title={<B.Link href="#card-details">공유 컴포넌트 정리</B.Link>}
       footer={
         <div className="gc-demo-row">
-          <B.Button variant="secondary" onClick={() => setCount(count + 1)}>
+          <B.Button
+            variant="secondary"
+            onClick={() => setCount((previous) => previous + 1)}
+          >
             즐겨찾기 {count}
           </B.Button>
           <B.Badge>진행 중</B.Badge>
@@ -402,16 +541,14 @@ function GridDemo() {
   const [width, setWidth] = useState(180);
   return (
     <div className="gc-basic-demo">
-      <label>
-        최소 셀 너비 {width}px{" "}
-        <input
-          type="range"
-          min="120"
-          max="300"
-          value={width}
-          onChange={(e) => setWidth(Number(e.target.value))}
-        />
-      </label>
+      <B.Slider
+        label="최소 셀 너비"
+        value={width}
+        onValueChange={setWidth}
+        min={120}
+        max={300}
+        valueText={`${width}px`}
+      />
       <B.Grid minWidth={width}>
         {["버튼", "이미지 뷰어", "검색 필터", "파일 업로더"].map((text) => (
           <div className="gc-demo-tile" key={text}>
@@ -449,6 +586,8 @@ function entry(spec: Spec): CatalogEntry {
       "button",
       "link",
       "text-field",
+      "stepper",
+      "slider",
       "text-area",
       "checkbox",
       "radio-group",
@@ -463,16 +602,17 @@ function entry(spec: Spec): CatalogEntry {
       : spec.contracts,
     category: spec.category ?? "basic",
     files: [
-      "src/components/basic/index.tsx",
+      `src/components/basic/${spec.id}.tsx`,
       "src/styles/basic.css",
       "src/styles/tokens.css",
     ],
     dependencies: [
-      "react (hooks, DOM rendering)",
-      "lucide-react (Alert 닫기 아이콘; 다른 컴포넌트만 복사할 때 제거 가능)",
+      "react",
+      ...(["stepper", "alert"].includes(spec.id) ? ["lucide-react"] : []),
+      "--gc-* 토큰",
     ],
     migration: [
-      "src/components/basic/index.tsx에서 필요한 export와 해당 타입을 복사하거나 전체 기본 컴포넌트 모듈을 가져옵니다.",
+      `src/components/basic/${spec.id}.tsx와 상대 import로 연결된 공용 컴포넌트·타입을 함께 가져옵니다.`,
       "src/styles/basic.css의 해당 .gc-* 규칙과 tokens.css를 가져와 프로젝트 의미 토큰에 연결합니다.",
       "아래 사용 예제의 이벤트를 프로젝트 상태·서비스에 연결합니다. 데모 코드는 이식하지 않습니다.",
       "키보드, 긴 한국어, 비활성·오류 상태와 모바일 너비에서 동작 계약을 재확인합니다.",
@@ -505,7 +645,7 @@ export const basicEntries: CatalogEntry[] = [
     ],
     keyboard: ["Tab으로 포커스", "Enter·Space로 실행"],
     usage:
-      '<Button isLoading={isSaving} onClick={save}>저장</Button>\n<IconButton label="즐겨찾기" onClick={toggleFavorite}><Star size={20} aria-hidden="true" /></IconButton>\n<IconButton label="닫기" size="compact" onClick={close}><X size={16} aria-hidden="true" /></IconButton>',
+      'import { Button, IconButton } from "./components/basic/button";\nimport { Star, X } from "lucide-react";\n\n<Button isLoading={isSaving} onClick={save}>저장</Button>\n<IconButton label="즐겨찾기" onClick={toggleFavorite}><Star size={20} aria-hidden="true" /></IconButton>\n<IconButton label="닫기" size="compact" onClick={close}><X size={16} aria-hidden="true" /></IconButton>',
     Demo: ButtonDemo,
   }),
   entry({
@@ -520,7 +660,8 @@ export const basicEntries: CatalogEntry[] = [
     ],
     states: ["기본", "호버", "포커스"],
     keyboard: ["Tab으로 포커스", "Enter로 이동"],
-    usage: '<Link href="/projects">프로젝트 목록</Link>',
+    usage:
+      'import { Link } from "./components/basic/link";\n\n<Link href="/projects">프로젝트 목록</Link>',
     Demo: LinkDemo,
   }),
   entry({
@@ -531,12 +672,81 @@ export const basicEntries: CatalogEntry[] = [
       "label은 입력 id와 연결하며 placeholder를 레이블로 대체하지 않습니다.",
       "error가 있으면 aria-invalid와 오류 설명 연결을 적용합니다.",
       "readOnly는 선택·포커스 가능하고 disabled는 입력·포커스 불가입니다.",
+      'type="number"는 브라우저 기본 증감 화살표를 숨기며 숫자 입력·키보드 ArrowUp/ArrowDown 동작은 유지합니다.',
+      "Input은 같은 입력 스타일을 제공하는 하위 primitive입니다. FormField 등 외부에서 label·설명을 공급할 때 사용합니다.",
     ],
-    states: ["기본", "입력", "필수", "오류", "읽기 전용", "비활성"],
+    states: [
+      "기본",
+      "입력",
+      "숫자·기본 화살표 없음",
+      "필수",
+      "오류",
+      "읽기 전용",
+      "비활성",
+    ],
     keyboard: ["Tab으로 입력 이동", "표준 텍스트 편집 단축키"],
     usage:
-      '<TextField label="이름" value={name} onChange={e => setName(e.target.value)} error={nameError} />',
+      'import { TextField } from "./components/basic/text-field";\nimport { Input } from "./components/basic/input";\n\n<TextField label="이름" value={name} onChange={e => setName(e.target.value)} error={nameError} />\n// FormField의 render prop 안에서는 <Input {...props} /> 사용',
     Demo: TextFieldDemo,
+  }),
+  entry({
+    id: "stepper",
+    name: "Stepper",
+    summary: "줄이기·직접 입력·늘리기로 수량과 숫자를 조절합니다.",
+    contracts: [
+      "value/onValueChange 제어형. min은 기본 0, step은 기본 1이며 max로 상한을 지정합니다.",
+      "기존 IconButton과 숫자 입력을 한 컨트롤로 조합. 최소·최대값에서는 해당 증감 버튼만 비활성화합니다.",
+      "직접 입력 중에만 draft를 유지합니다. Enter·포커스 이동·증감 조작은 변경을 요청하고 확정 표시는 부모 value를 따릅니다. 부모가 요청을 거절하거나 지연하면 미승인 값은 표시하지 않습니다. 빈 입력은 부모 값으로 복원합니다.",
+      "소수·지수 step은 십진 정밀도를 유지합니다. step은 양수, value/min/max는 유효한 숫자로 전달합니다. 상한이 step에 맞지 않으면 min 기준으로 max 이하의 마지막 step 값이 유효 상한입니다(0~10, step=3이면 9). 직접 입력·버튼·End가 같은 정책을 사용합니다.",
+      "label과 입력·설명을 연결하며 error는 aria-invalid로 안내. isReadOnly는 값 확인·선택 가능, isDisabled는 모든 조작 차단.",
+      "입력의 기본 증감 화살표를 숨기고 양옆 버튼에 읽을 수 있는 이름을 제공합니다. 브랜드·밀도·다크 모드는 --gc-* 토큰을 따릅니다.",
+    ],
+    states: [
+      "기본",
+      "최소·최대",
+      "직접 입력",
+      "소수 단위",
+      "읽기 전용",
+      "비활성",
+      "오류",
+    ],
+    keyboard: [
+      "Tab: 줄이기·숫자 입력·늘리기 이동",
+      "버튼 Enter/Space: 증감",
+      "입력 ArrowUp/ArrowDown: 증감",
+      "Home/End: 최소·최대값(상한이 있을 때)",
+      "Enter: 입력 확정",
+    ],
+    usage:
+      'import { Stepper } from "./components/basic/stepper";\n\n<Stepper label="수량" value={quantity} onValueChange={setQuantity} min={0} max={10} />\n<Stepper label="간격" value={amount} onValueChange={setAmount} step={0.1} max={2} />',
+    Demo: StepperDemo,
+  }),
+  entry({
+    id: "slider",
+    name: "Slider",
+    summary: "범위 안의 숫자를 트랙과 키보드로 연속 조절합니다.",
+    contracts: [
+      "value/onValueChange 제어형. min=0, max=100, step=1이 기본이며 숫자 범위를 명시할 수 있습니다.",
+      "label과 native range 입력을 연결하며 valueText를 보이는 현재 값과 aria-valuetext에 사용합니다.",
+      "isDisabled는 포커스와 조작을 차단. description·error는 입력과 연결합니다.",
+      "트랙·thumb·선택 구간은 --gc-* 토큰을 사용해 Blue·Forest·다크·밀도에 대응합니다.",
+    ],
+    states: [
+      "기본",
+      "최소·최대",
+      "사용자 지정 범위·단위",
+      "비활성",
+      "키보드 포커스",
+    ],
+    keyboard: [
+      "Tab: 포커스",
+      "방향키: step 단위 증감",
+      "Home/End: 최소·최대",
+      "PageUp/PageDown: 브라우저 기본 범위 이동",
+    ],
+    usage:
+      'import { Slider } from "./components/basic/slider";\n\n<Slider label="볼륨" value={volume} onValueChange={setVolume} valueText={`${volume}%`} />',
+    Demo: SliderDemo,
   }),
   entry({
     id: "text-area",
@@ -550,7 +760,7 @@ export const basicEntries: CatalogEntry[] = [
     states: ["빈 입력", "여러 줄", "글자 수 제한", "오류", "비활성"],
     keyboard: ["Enter로 줄바꿈", "Tab으로 다음 입력"],
     usage:
-      '<TextArea label="설명" value={description} onChange={e => setDescription(e.target.value)} shouldAutoSize maxLength={300} />',
+      'import { TextArea } from "./components/basic/text-area";\n\n<TextArea label="설명" value={description} onChange={e => setDescription(e.target.value)} shouldAutoSize maxLength={300} />',
     Demo: TextAreaDemo,
   }),
   entry({
@@ -558,6 +768,7 @@ export const basicEntries: CatalogEntry[] = [
     name: "Checkbox",
     summary: "독립 선택과 전체 선택의 혼합 상태",
     contracts: [
+      "shouldHideLabel은 보이는 라벨만 숨기고 접근 가능한 이름을 유지합니다. 표의 선택 칸에도 같은 Checkbox를 사용합니다.",
       "label 클릭으로 값을 토글합니다.",
       "isMixed는 indeterminate로 전체 선택의 일부 선택 상태를 표현합니다. 20px 둥근 사각형에 체크 또는 혼합 마이너스를 표시합니다.",
       "네이티브 input 의미를 유지하며 고대비 환경에서는 브라우저 기본 외형으로 전환합니다.",
@@ -566,7 +777,7 @@ export const basicEntries: CatalogEntry[] = [
     states: ["미선택", "선택", "혼합", "비활성"],
     keyboard: ["Tab으로 이동", "Space로 토글"],
     usage:
-      '<Checkbox label="전체 선택" isChecked={isAllSelected} isMixed={hasPartialSelection} onCheckedChange={selectAll} />',
+      'import { Checkbox } from "./components/basic/checkbox";\n\n<Checkbox label="전체 선택" isChecked={isAllSelected} isMixed={hasPartialSelection} onCheckedChange={selectAll} />',
     Demo: CheckboxDemo,
   }),
   entry({
@@ -581,7 +792,7 @@ export const basicEntries: CatalogEntry[] = [
     states: ["미선택", "선택", "그룹 비활성"],
     keyboard: ["Tab으로 그룹 이동", "방향키로 선택 이동", "Space로 선택"],
     usage:
-      '<RadioGroup label="주기" value={period} options={periodOptions} onValueChange={setPeriod} />',
+      'import { RadioGroup } from "./components/basic/radio-group";\n\n<RadioGroup label="주기" value={period} options={periodOptions} onValueChange={setPeriod} />',
     Demo: RadioDemo,
   }),
   entry({
@@ -596,7 +807,7 @@ export const basicEntries: CatalogEntry[] = [
     states: ["켜짐", "꺼짐", "비활성"],
     keyboard: ["Tab으로 이동", "Space로 토글"],
     usage:
-      '<Switch label="이메일 알림" isChecked={isEnabled} onCheckedChange={setIsEnabled} />',
+      'import { Switch } from "./components/basic/switch";\n\n<Switch label="이메일 알림" isChecked={isEnabled} onCheckedChange={setIsEnabled} />',
     Demo: SwitchDemo,
   }),
   entry({
@@ -609,7 +820,8 @@ export const basicEntries: CatalogEntry[] = [
     ],
     states: ["중립", "성공", "위험", "주의"],
     keyboard: ["포커스 대상 아님"],
-    usage: '<Badge tone="success">완료</Badge>',
+    usage:
+      'import { Badge } from "./components/basic/badge";\n\n<Badge tone="success">완료</Badge>',
     Demo: BadgeDemo,
   }),
   entry({
@@ -624,8 +836,32 @@ export const basicEntries: CatalogEntry[] = [
     states: ["안내", "성공", "주의", "오류", "닫기 가능"],
     keyboard: ["내부 액션·닫기 버튼은 Tab·Enter·Space"],
     usage:
-      '<Alert title="저장 실패" tone="danger">입력 내용은 유지했어요.</Alert>',
+      'import { Alert } from "./components/basic/alert";\n\n<Alert title="저장 실패" tone="danger">입력 내용은 유지했어요.</Alert>',
     Demo: AlertDemo,
+  }),
+  entry({
+    id: "spinner",
+    name: "Spinner",
+    summary: "원형 선과 속도가 다른 여러 원으로 불확정 로딩을 표시합니다.",
+    contracts: [
+      'variant="ring"(기본)은 둥근 끝의 원형 선이 800ms 주기로 회전합니다. variant="orbit"은 작은 원 4개가 각각 1200·1600·2100·2700ms 주기로 공전합니다.',
+      "size는 small=16px, medium=32px(기본), large=48px. tone은 accent(기본), muted, inherit이며 --gc-* 토큰을 사용합니다.",
+      "기본은 role=status와 label(기본 불러오는 중)로 작업 상태를 안내합니다. 진행률·남은 시간을 추정하지 않으며 표시 여부는 호출부가 결정합니다.",
+      "isDecorative=true는 role과 안내 텍스트를 제외하고 aria-hidden을 적용합니다. 버튼·다른 상태 안내 안에 중복 배치할 때 사용합니다.",
+      "포커스나 사용자 조작이 없는 표시 요소입니다. prefers-reduced-motion에서는 회전을 멈추고 원형 선·각 원의 정적인 배치와 상태 안내를 유지합니다.",
+    ],
+    states: [
+      "원형 선",
+      "여러 원의 독립 회전",
+      "16px·32px·48px",
+      "강조·보조·상속 색상",
+      "장식형",
+      "모션 감소",
+    ],
+    keyboard: ["포커스 대상 아님"],
+    usage:
+      'import { Spinner } from "./components/basic/spinner";\nimport { Button } from "./components/basic/button";\n\n<Spinner label="목록을 불러오는 중" />\n<Spinner variant="orbit" size="large" label="이미지를 준비하는 중" />\n<Button disabled><Spinner size="small" tone="inherit" isDecorative /> 처리 중</Button>',
+    Demo: SpinnerDemo,
   }),
   entry({
     id: "skeleton",
@@ -638,7 +874,8 @@ export const basicEntries: CatalogEntry[] = [
     ],
     states: ["로딩", "콘텐츠 전환"],
     keyboard: ["포커스 대상 아님"],
-    usage: '<Skeleton width="60%" height={24} />',
+    usage:
+      'import { Skeleton } from "./components/basic/skeleton";\n\n<Skeleton width="60%" height={24} />',
     Demo: SkeletonDemo,
   }),
   entry({
@@ -666,7 +903,7 @@ export const basicEntries: CatalogEntry[] = [
     ],
     keyboard: ["포커스 대상 아님"],
     usage:
-      '<Progress label="파일 처리" value={progress} size="thick" />\n<Progress label="처리 중" size="thin" />',
+      'import { Progress } from "./components/basic/progress";\n\n<Progress label="파일 처리" value={progress} size="thick" />\n<Progress label="처리 중" size="thin" />',
     Demo: ProgressDemo,
   }),
   entry({
@@ -681,7 +918,7 @@ export const basicEntries: CatalogEntry[] = [
     states: ["로딩", "로드 완료", "로드 실패"],
     keyboard: ["포커스 대상 아님"],
     usage:
-      '<Image src={photo.url} alt={photo.description} aspectRatio="4 / 3" />',
+      'import { Image } from "./components/basic/image";\n\n<Image src={photo.url} alt={photo.description} aspectRatio="4 / 3" />',
     Demo: ImageDemo,
   }),
   entry({
@@ -695,7 +932,8 @@ export const basicEntries: CatalogEntry[] = [
     ],
     states: ["사진", "사진 없음", "실패", "크기 변경"],
     keyboard: ["포커스 대상 아님"],
-    usage: "<Avatar name={user.name} src={user.photoUrl} size={44} />",
+    usage:
+      'import { Avatar } from "./components/basic/avatar";\n\n<Avatar name={user.name} src={user.photoUrl} size={44} />',
     Demo: AvatarDemo,
   }),
   entry({
@@ -710,7 +948,7 @@ export const basicEntries: CatalogEntry[] = [
     states: ["본문", "헤더·푸터 포함", "내부 액션"],
     keyboard: ["내부 링크·버튼의 기본 조작"],
     usage:
-      '<Card title="프로젝트" footer={<Button onClick={save}>저장</Button>}>설명</Card>',
+      'import { Card } from "./components/basic/card";\nimport { Button } from "./components/basic/button";\n\n<Card title="프로젝트" footer={<Button onClick={save}>저장</Button>}>설명</Card>',
     Demo: CardDemo,
   }),
   entry({
@@ -729,7 +967,7 @@ export const basicEntries: CatalogEntry[] = [
       "내부 링크·버튼 조작",
     ],
     usage:
-      '<Table caption="프로젝트" headers={["이름", "상태"]} rows={projectRows} />',
+      'import { Table } from "./components/basic/table";\n\n<Table caption="프로젝트" headers={["이름", "상태"]} rows={projectRows} />',
     Demo: TableDemo,
   }),
   entry({
@@ -744,7 +982,7 @@ export const basicEntries: CatalogEntry[] = [
     states: ["처음", "중간", "마지막", "처리 중"],
     keyboard: ["Tab으로 버튼 이동", "Enter·Space로 페이지 요청"],
     usage:
-      "<Pagination page={page} totalPages={totalPages} onPageChange={loadPage} isLoading={isLoading} />",
+      'import { Pagination } from "./components/basic/pagination";\n\n<Pagination page={page} totalPages={totalPages} onPageChange={loadPage} isLoading={isLoading} />',
     Demo: PaginationDemo,
   }),
   entry({
@@ -759,7 +997,8 @@ export const basicEntries: CatalogEntry[] = [
     ],
     states: ["제목", "소제목", "본문", "보조"],
     keyboard: ["정적 텍스트"],
-    usage: '<Typography variant="heading">프로젝트 개요</Typography>',
+    usage:
+      'import { Typography } from "./components/basic/typography";\n\n<Typography variant="heading">프로젝트 개요</Typography>',
     Demo: TypographyDemo,
   }),
   entry({
@@ -774,7 +1013,8 @@ export const basicEntries: CatalogEntry[] = [
     ],
     states: ["세로", "가로", "줄바꿈"],
     keyboard: ["내부 요소의 DOM 순서를 유지"],
-    usage: '<Stack direction="row" gap={16}>{actions}</Stack>',
+    usage:
+      'import { Stack } from "./components/basic/stack";\n\n<Stack direction="row" gap={16}>{actions}</Stack>',
     Demo: StackDemo,
   }),
   entry({
@@ -789,7 +1029,8 @@ export const basicEntries: CatalogEntry[] = [
     ],
     states: ["다중 열", "단일 열"],
     keyboard: ["내부 요소의 DOM 순서를 유지"],
-    usage: "<Grid minWidth={180}>{cards}</Grid>",
+    usage:
+      'import { Grid } from "./components/basic/grid";\n\n<Grid minWidth={180}>{cards}</Grid>',
     Demo: GridDemo,
   }),
   entry({
@@ -803,7 +1044,8 @@ export const basicEntries: CatalogEntry[] = [
     ],
     states: ["기본"],
     keyboard: ["포커스 대상 아님"],
-    usage: "<Divider />",
+    usage:
+      'import { Divider } from "./components/basic/divider";\n\n<Divider />',
     Demo: DividerDemo,
   }),
 ];

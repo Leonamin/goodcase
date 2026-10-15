@@ -1,3 +1,4 @@
+import { selectOption } from "./helpers/select-option";
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 import { unzipSync, strFromU8 } from "fflate";
@@ -11,6 +12,8 @@ const ids = [
   "button",
   "link",
   "text-field",
+  "stepper",
+  "slider",
   "text-area",
   "checkbox",
   "radio-group",
@@ -18,6 +21,7 @@ const ids = [
   "badge",
   "alert",
   "skeleton",
+  "spinner",
   "progress",
   "image",
   "avatar",
@@ -82,7 +86,7 @@ test("navigation, docs deep links, theme and review survive refresh", async ({
   await page.reload();
   await expect(page.getByRole("button", { name: "검토 완료" })).toBeVisible();
   await page.getByRole("link", { name: "미리보기", exact: true }).click();
-  await page.getByLabel("테마", { exact: true }).selectOption("forest");
+  await selectOption(page.getByLabel("테마", { exact: true }), "forest");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "forest");
 });
 
@@ -365,9 +369,9 @@ test("source download includes transitive modules, styles and migration contract
   expect(path).not.toBeNull();
   const archive = unzipSync(await readFile(path!));
   for (const file of [
-    "src/components/composed/index.tsx",
-    "src/components/overlays/index.tsx",
-    "src/components/basic/index.tsx",
+    "src/components/composed/image-viewer.tsx",
+    "src/components/overlays/dialog.tsx",
+    "src/components/basic/button.tsx",
     "src/styles/tokens.css",
     "MIGRATION.md",
   ])

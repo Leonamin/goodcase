@@ -1,12 +1,13 @@
+import { selectOption } from "./helpers/select-option";
 import { test, expect } from "@playwright/test";
 const live = ".gc-toast-viewport .gc-toast";
 test("stack queues without loss, expands on hover, and promotes FIFO after animated exit", async ({
   page,
 }) => {
   await page.goto("/?component=toast");
-  await page.getByLabel("알림 배치").selectOption("stack");
-  await page.getByLabel("스택 표시 개수").selectOption("2");
-  await page.getByLabel("자동 닫힘 시간").selectOption("10000");
+  await selectOption(page.getByLabel("알림 배치"), "stack");
+  await selectOption(page.getByLabel("스택 표시 개수"), "2");
+  await selectOption(page.getByLabel("자동 닫힘 시간"), "10000");
   await page
     .getByRole("button", { name: "여러 알림 띄우기", exact: true })
     .click();
@@ -41,7 +42,7 @@ test("keyboard focus expands stack and reduced motion closes immediately", async
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/?component=toast");
-  await page.getByLabel("알림 배치").selectOption("stack");
+  await selectOption(page.getByLabel("알림 배치"), "stack");
   await page
     .getByRole("button", { name: "여러 알림 띄우기", exact: true })
     .click();
@@ -68,7 +69,7 @@ test("direction controls anchor and enter animation; animation clock does not re
   page,
 }) => {
   await page.goto("/?component=toast");
-  await page.getByLabel("진입 방향").selectOption("down");
+  await selectOption(page.getByLabel("진입 방향"), "down");
   await page.getByRole("button", { name: "정보 알림", exact: true }).click();
   await page.mouse.move(1, 1);
   const card = page.locator(live);
@@ -139,8 +140,8 @@ for (const direction of ["up", "down"] as const) {
     page,
   }) => {
     await page.goto("/?component=toast");
-    await page.getByLabel("진입 방향").selectOption(direction);
-    await page.getByLabel("자동 닫힘 시간").selectOption("10000");
+    await selectOption(page.getByLabel("진입 방향"), direction);
+    await selectOption(page.getByLabel("자동 닫힘 시간"), "10000");
     await page
       .getByRole("button", { name: "여러 알림 띄우기", exact: true })
       .click();

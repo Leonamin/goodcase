@@ -44,13 +44,13 @@
   box-shadow: var(--gc-toast-shadow, 0 3px 10px #1720331f);
   padding: 0;
   overflow: visible;
-  animation: gc-toast-enter-up 180ms ease both;
+  animation: gc-toast-enter-up var(--gc-toast-enter-duration) ease both;
 }
 .gc-toast[data-direction="down"] {
   animation-name: gc-toast-enter-down;
 }
 .gc-toast[data-phase="closing"] {
-  animation: gc-toast-exit 180ms ease both;
+  animation: gc-toast-exit var(--gc-toast-exit-duration) ease both;
 }
 .gc-toast-content {
   padding: var(--gc-space-4);
@@ -216,6 +216,11 @@
   gap: var(--gc-space-2);
   font-size: var(--gc-text-sm);
 }
+.gc-toast-demo-controls .gc-overlay-field {
+  width: auto;
+  min-width: min(100%, calc(var(--gc-space-8) * 4));
+  max-width: 100%;
+}
 /* Scrolling activates only when the expanded measured stage exceeds the screen. Padding budgets the modest shadow. */
 .gc-toast-viewport[data-can-scroll="true"] {
   overflow-y: auto;
@@ -279,20 +284,6 @@
     transition: none !important;
   }
 }
-.gc-toast-demo-controls select {
-  min-height: var(--gc-control-height);
-  padding: var(--gc-space-2) var(--gc-space-3);
-  border: 1px solid var(--gc-control-border);
-  border-radius: var(--gc-radius-sm);
-  background: var(--gc-surface);
-  color: var(--gc-text);
-  font: inherit;
-}
-.gc-toast-demo-controls select:focus-visible {
-  outline: 2px solid var(--gc-focus);
-  outline-offset: 2px;
-}
-
 .gc-toast-viewport[data-empty="true"] {
   visibility: hidden;
   pointer-events: none;

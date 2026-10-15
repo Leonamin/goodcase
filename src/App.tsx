@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import {
   Check,
   ChevronRight,
@@ -18,9 +18,11 @@ import {
   TextField,
   Typography,
 } from "./components/basic";
+import { Select } from "./components/overlays";
 import { entries } from "./catalog";
 import { downloadSource, filesFor, sourceFiles } from "./catalog/source";
 import type { CatalogEntry } from "./catalog/types";
+import { useMobileNavigation } from "./gallery/use-mobile-navigation";
 
 const tabs = [
   { id: "preview", label: "미리보기" },
@@ -84,10 +86,9 @@ export function App({
   const [theme, setTheme] = useState("reference");
   const [density, setDensity] = useState("comfortable");
   const [colorMode, setColorMode] = useState("light");
-  const [isNavOpen, setIsNavOpen] = useState(false);
+  const { isNavOpen, setIsNavOpen, sidebarRef } = useMobileNavigation();
   const [reviews, setReviews] = useState(readReviews);
   const [revision, setRevision] = useState(0);
-  const sidebarRef = useRef<HTMLElement>(null);
   const entry = entries.find((item) => item.id === location.id) ?? entries[0];
   const activeTab = tabs.some((tab) => tab.id === location.tab)
     ? location.tab
@@ -108,43 +109,6 @@ export function App({
     document.documentElement.dataset.colorMode = colorMode;
     document.documentElement.dataset.density = density;
   }, [theme, density, colorMode]);
-  useEffect(() => {
-    if (!isNavOpen) return;
-    const previousFocus = document.activeElement as HTMLElement | null;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    const focusable = () =>
-      Array.from(
-        sidebarRef.current?.querySelectorAll<HTMLElement>(
-          "a[href], button:not(:disabled), input:not(:disabled)",
-        ) ?? [],
-      );
-    focusable()[0]?.focus();
-    const handleKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        setIsNavOpen(false);
-      }
-      if (event.key === "Tab") {
-        const items = focusable();
-        const first = items[0];
-        const last = items[items.length - 1];
-        if (event.shiftKey && document.activeElement === first) {
-          event.preventDefault();
-          last?.focus();
-        } else if (!event.shiftKey && document.activeElement === last) {
-          event.preventDefault();
-          first?.focus();
-        }
-      }
-    };
-    document.addEventListener("keydown", handleKey);
-    return () => {
-      document.removeEventListener("keydown", handleKey);
-      document.body.style.overflow = previousOverflow;
-      previousFocus?.focus();
-    };
-  }, [isNavOpen]);
   function navigate(id: string, tab = "preview") {
     setLocation({ id, tab });
     const url = new URL(window.location.href);
@@ -256,6 +220,7 @@ export function App({
       </aside>
       {isNavOpen && (
         <button
+          data-interaction-exception="sidebar-backdrop"
           className="nav-backdrop"
           tabIndex={-1}
           aria-label="목록 닫기"
@@ -330,39 +295,33 @@ export function App({
               <div className="preview-stage">
                 <div className="preview-toolbar">
                   <div>
-                    <label>
-                      테마
-                      <select
-                        aria-label="테마"
-                        value={theme}
-                        onChange={(event) => setTheme(event.target.value)}
-                      >
-                        <option value="reference">기본 · Blue</option>
-                        <option value="forest">변형 · Forest</option>
-                      </select>
-                    </label>
-                    <label>
-                      색상 모드
-                      <select
-                        aria-label="색상 모드"
-                        value={colorMode}
-                        onChange={(event) => setColorMode(event.target.value)}
-                      >
-                        <option value="light">라이트</option>
-                        <option value="dark">다크</option>
-                      </select>
-                    </label>
-                    <label>
-                      밀도
-                      <select
-                        aria-label="밀도"
-                        value={density}
-                        onChange={(event) => setDensity(event.target.value)}
-                      >
-                        <option value="comfortable">기본</option>
-                        <option value="compact">조밀하게</option>
-                      </select>
-                    </label>
+                    <Select
+                      label="테마"
+                      value={theme}
+                      onValueChange={setTheme}
+                      options={[
+                        { value: "reference", label: "기본 · Blue" },
+                        { value: "forest", label: "변형 · Forest" },
+                      ]}
+                    />
+                    <Select
+                      label="색상 모드"
+                      value={colorMode}
+                      onValueChange={setColorMode}
+                      options={[
+                        { value: "light", label: "라이트" },
+                        { value: "dark", label: "다크" },
+                      ]}
+                    />
+                    <Select
+                      label="밀도"
+                      value={density}
+                      onValueChange={setDensity}
+                      options={[
+                        { value: "comfortable", label: "기본" },
+                        { value: "compact", label: "조밀하게" },
+                      ]}
+                    />
                   </div>
                   <Button
                     variant="secondary"
@@ -517,21 +476,15 @@ function SourcePanel({ entry }: { entry: CatalogEntry }) {
   return (
     <section className="source-panel">
       <div className="source-toolbar">
-        <label>
-          파일
-          <select
-            aria-label="소스 파일"
-            value={file}
-            onChange={(event) => {
-              setFile(event.target.value);
-              setCopyStatus("");
-            }}
-          >
-            {files.map((path) => (
-              <option key={path}>{path}</option>
-            ))}
-          </select>
-        </label>
+        <Select
+          label="소스 파일"
+          value={file}
+          onValueChange={(next) => {
+            setFile(next);
+            setCopyStatus("");
+          }}
+          options={files.map((path) => ({ value: path, label: path }))}
+        />
         <Button variant="secondary" onClick={copy}>
           코드 복사
         </Button>
