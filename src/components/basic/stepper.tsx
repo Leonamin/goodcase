@@ -3,6 +3,7 @@ import { useId, useState, useEffect } from "react";
 import { IconButton } from "./button";
 import { Input } from "./input";
 import type { FieldProps } from "./field";
+import { createStepperRange } from "./stepper-value";
 
 export type StepperProps = FieldProps & {
   value: number;
@@ -15,11 +16,6 @@ export type StepperProps = FieldProps & {
   id?: string;
   name?: string;
 };
-
-function decimalPlaces(value: number) {
-  const [base, exponent = "0"] = String(value).toLowerCase().split("e");
-  return Math.max(0, (base.split(".")[1]?.length ?? 0) - Number(exponent));
-}
 
 export function Stepper({
   label,
@@ -37,29 +33,31 @@ export function Stepper({
 }: StepperProps) {
   const generated = useId();
   const inputId = id ?? generated;
-  const increment = Number.isFinite(step) && step > 0 ? step : 1;
-  const upperBound = Math.max(min, max ?? Infinity);
-  const precision = Math.min(
-    12,
-    Math.max(decimalPlaces(increment), decimalPlaces(min)),
+  const range = createStepperRange(min, max, step);
+  const currentValue = range.normalize(value);
+  const [draft, setDraft] = useState<{
+    text: string;
+    sourceValue: number;
+  } | null>(null);
+  // The draft is only an in-progress edit; rejected and delayed commits keep displaying value.
+  useEffect(
+    () => setDraft(null),
+    [currentValue, min, max, step, isDisabled, isReadOnly],
   );
-  const normalize = (next: number) => {
-    const aligned = min + Math.round((next - min) / increment) * increment;
-    return Math.min(
-      upperBound,
-      Math.max(min, Number(aligned.toFixed(precision))),
-    );
-  };
-  const currentValue = normalize(Number.isFinite(value) ? value : min);
-  const [draft, setDraft] = useState(() => String(currentValue));
-  useEffect(() => setDraft(String(currentValue)), [currentValue]);
-  const hasDraftNumber = draft.trim() !== "" && Number.isFinite(Number(draft));
-  const draftValue = hasDraftNumber ? normalize(Number(draft)) : currentValue;
-  const canDecrease = !isDisabled && !isReadOnly && draftValue > min;
-  const canIncrease = !isDisabled && !isReadOnly && draftValue < upperBound;
+  const hasDraft = draft !== null && draft.sourceValue === currentValue;
+  const inputValue = hasDraft ? draft.text : String(currentValue);
+  const hasDraftNumber =
+    inputValue.trim() !== "" && Number.isFinite(Number(inputValue));
+  const draftValue = hasDraftNumber
+    ? range.normalize(Number(inputValue))
+    : currentValue;
+  const canDecrease =
+    !isDisabled && !isReadOnly && range.move(draftValue, -1) < draftValue;
+  const canIncrease =
+    !isDisabled && !isReadOnly && range.move(draftValue, 1) > draftValue;
   const apply = (next: number) => {
-    const normalized = normalize(next);
-    setDraft(String(normalized));
+    const normalized = range.normalize(next);
+    setDraft(null);
     if (normalized !== value) onValueChange(normalized);
   };
   return (
@@ -72,7 +70,7 @@ export function Stepper({
         <IconButton
           label={`${label} 줄이기`}
           disabled={!canDecrease}
-          onClick={() => apply(draftValue - increment)}
+          onClick={() => apply(range.move(draftValue, -1))}
         >
           <Minus size={18} aria-hidden="true" />
         </IconButton>
@@ -82,17 +80,19 @@ export function Stepper({
           type="number"
           inputMode="decimal"
           className="gc-stepper-input"
-          value={draft}
-          min={min}
-          max={Number.isFinite(upperBound) ? upperBound : undefined}
-          step={increment}
+          value={inputValue}
+          min={range.min}
+          max={range.max}
+          step={range.step}
           disabled={isDisabled}
           readOnly={isReadOnly}
           aria-invalid={!!error}
           aria-describedby={
             error || description ? `${inputId}-help` : undefined
           }
-          onChange={(event) => setDraft(event.target.value)}
+          onChange={(event) =>
+            setDraft({ text: event.target.value, sourceValue: currentValue })
+          }
           onBlur={() => {
             if (!isDisabled && !isReadOnly) apply(draftValue);
           }}
@@ -100,15 +100,13 @@ export function Stepper({
             if (isDisabled || isReadOnly) return;
             if (event.key === "ArrowUp" || event.key === "ArrowDown") {
               event.preventDefault();
-              apply(
-                draftValue + (event.key === "ArrowUp" ? increment : -increment),
-              );
-            } else if (
-              event.key === "Home" ||
-              (event.key === "End" && Number.isFinite(upperBound))
-            ) {
+              apply(range.move(draftValue, event.key === "ArrowUp" ? 1 : -1));
+            } else if (event.key === "Home") {
               event.preventDefault();
-              apply(event.key === "Home" ? min : upperBound);
+              apply(range.min);
+            } else if (event.key === "End" && range.max !== undefined) {
+              event.preventDefault();
+              apply(range.max);
             } else if (event.key === "Enter") {
               event.preventDefault();
               apply(draftValue);
@@ -118,7 +116,7 @@ export function Stepper({
         <IconButton
           label={`${label} 늘리기`}
           disabled={!canIncrease}
-          onClick={() => apply(draftValue + increment)}
+          onClick={() => apply(range.move(draftValue, 1))}
         >
           <Plus size={18} aria-hidden="true" />
         </IconButton>
