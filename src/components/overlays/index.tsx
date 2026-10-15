@@ -449,6 +449,7 @@ export { Tabs } from "./tabs";
 export type { TabsProps, TabItem, TabsVariant } from "./tabs";
 export function Accordion({
   items,
+  hasAnimation = true,
 }: {
   items: {
     value: string;
@@ -456,9 +457,13 @@ export function Accordion({
     content: ReactNode;
     isDisabled?: boolean;
   }[];
+  hasAnimation?: boolean;
 }) {
   return (
-    <RAccordion.Root type="multiple" className="gc-accordion">
+    <RAccordion.Root
+      type="multiple"
+      className={`gc-accordion${hasAnimation ? " gc-accordion-animated" : ""}`}
+    >
       {items.map((item) => (
         <RAccordion.Item
           key={item.value}

@@ -112,9 +112,80 @@ function TextFieldDemo() {
       />
       <B.TextField label="읽기 전용" value="goodcase-reference" readOnly />
       <B.TextField label="비활성 입력" defaultValue="변경 권한 없음" disabled />
+      <B.TextField
+        label="숫자 입력"
+        type="number"
+        min={0}
+        defaultValue={12}
+        description="기본 증감 화살표 없이 숫자를 입력합니다."
+      />
     </div>
   );
 }
+function StepperDemo() {
+  const [quantity, setQuantity] = useState(1);
+  const [amount, setAmount] = useState(0.5);
+  return (
+    <div className="gc-basic-demo">
+      <B.Stepper
+        label="수량"
+        value={quantity}
+        onValueChange={setQuantity}
+        min={0}
+        max={10}
+        description="0~10개 · 버튼 또는 직접 입력으로 조절합니다."
+      />
+      <B.Stepper
+        label="소수 단위"
+        value={amount}
+        onValueChange={setAmount}
+        min={0}
+        max={2}
+        step={0.1}
+        description="0.1 단위 · 입력 후 Enter 또는 포커스 이동으로 확정합니다."
+      />
+      <div className="gc-demo-row">
+        <B.Stepper
+          label="읽기 전용 수량"
+          value={4}
+          onValueChange={() => {}}
+          isReadOnly
+        />
+        <B.Stepper
+          label="비활성 수량"
+          value={2}
+          onValueChange={() => {}}
+          isDisabled
+        />
+      </div>
+      <B.Typography variant="caption">
+        선택한 수량 {quantity}개 · 소수 값 {amount}
+      </B.Typography>
+    </div>
+  );
+}
+
+function SliderDemo() {
+  const [value, setValue] = useState(35);
+  return (
+    <div className="gc-basic-demo">
+      <B.Slider
+        label="볼륨"
+        value={value}
+        onValueChange={setValue}
+        valueText={`${value}%`}
+        description="방향키 또는 트랙을 눌러 조절합니다."
+      />
+      <B.Slider
+        label="비활성 범위"
+        value={60}
+        onValueChange={() => {}}
+        isDisabled
+      />
+    </div>
+  );
+}
+
 function TextAreaDemo() {
   const [value, setValue] = useState("");
   return (
@@ -260,16 +331,12 @@ function ProgressDemo() {
   const [value, setValue] = useState(35);
   return (
     <div className="gc-basic-demo">
-      <label className="gc-progress-range">
-        진행률 조절 · {value}%{" "}
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={value}
-          onChange={(e) => setValue(Number(e.target.value))}
-        />
-      </label>
+      <B.Slider
+        label="진행률 조절"
+        value={value}
+        onValueChange={setValue}
+        valueText={`${value}%`}
+      />
       <B.Progress label="얇게 · 8px" value={value} size="thin" />
       <B.Progress label="기본 · 14px" value={value} />
       <B.Progress
@@ -402,16 +469,14 @@ function GridDemo() {
   const [width, setWidth] = useState(180);
   return (
     <div className="gc-basic-demo">
-      <label>
-        최소 셀 너비 {width}px{" "}
-        <input
-          type="range"
-          min="120"
-          max="300"
-          value={width}
-          onChange={(e) => setWidth(Number(e.target.value))}
-        />
-      </label>
+      <B.Slider
+        label="최소 셀 너비"
+        value={width}
+        onValueChange={setWidth}
+        min={120}
+        max={300}
+        valueText={`${width}px`}
+      />
       <B.Grid minWidth={width}>
         {["버튼", "이미지 뷰어", "검색 필터", "파일 업로더"].map((text) => (
           <div className="gc-demo-tile" key={text}>
@@ -449,6 +514,8 @@ function entry(spec: Spec): CatalogEntry {
       "button",
       "link",
       "text-field",
+      "stepper",
+      "slider",
       "text-area",
       "checkbox",
       "radio-group",
@@ -531,12 +598,81 @@ export const basicEntries: CatalogEntry[] = [
       "label은 입력 id와 연결하며 placeholder를 레이블로 대체하지 않습니다.",
       "error가 있으면 aria-invalid와 오류 설명 연결을 적용합니다.",
       "readOnly는 선택·포커스 가능하고 disabled는 입력·포커스 불가입니다.",
+      'type="number"는 브라우저 기본 증감 화살표를 숨기며 숫자 입력·키보드 ArrowUp/ArrowDown 동작은 유지합니다.',
+      "Input은 같은 입력 스타일을 제공하는 하위 primitive입니다. FormField 등 외부에서 label·설명을 공급할 때 사용합니다.",
     ],
-    states: ["기본", "입력", "필수", "오류", "읽기 전용", "비활성"],
+    states: [
+      "기본",
+      "입력",
+      "숫자·기본 화살표 없음",
+      "필수",
+      "오류",
+      "읽기 전용",
+      "비활성",
+    ],
     keyboard: ["Tab으로 입력 이동", "표준 텍스트 편집 단축키"],
     usage:
-      '<TextField label="이름" value={name} onChange={e => setName(e.target.value)} error={nameError} />',
+      '<TextField label="이름" value={name} onChange={e => setName(e.target.value)} error={nameError} />\n// FormField의 render prop 안에서는 <Input {...props} /> 사용',
     Demo: TextFieldDemo,
+  }),
+  entry({
+    id: "stepper",
+    name: "Stepper",
+    summary: "줄이기·직접 입력·늘리기로 수량과 숫자를 조절합니다.",
+    contracts: [
+      "value/onValueChange 제어형. min은 기본 0, step은 기본 1이며 max로 상한을 지정합니다.",
+      "기존 IconButton과 숫자 입력을 한 컨트롤로 조합. 최소·최대값에서는 해당 증감 버튼만 비활성화합니다.",
+      "직접 입력은 Enter 또는 포커스 이동 시 확정하며 min 기준 step에 맞춘 뒤 범위 안으로 제한합니다. 빈 입력은 이전 값으로 복원합니다.",
+      "소수 step의 부동소수점 오차를 정리합니다. step은 양수, value/min/max는 유효한 숫자로 전달합니다.",
+      "label과 입력·설명을 연결하며 error는 aria-invalid로 안내. isReadOnly는 값 확인·선택 가능, isDisabled는 모든 조작 차단.",
+      "입력의 기본 증감 화살표를 숨기고 양옆 버튼에 읽을 수 있는 이름을 제공합니다. 브랜드·밀도·다크 모드는 --gc-* 토큰을 따릅니다.",
+    ],
+    states: [
+      "기본",
+      "최소·최대",
+      "직접 입력",
+      "소수 단위",
+      "읽기 전용",
+      "비활성",
+      "오류",
+    ],
+    keyboard: [
+      "Tab: 줄이기·숫자 입력·늘리기 이동",
+      "버튼 Enter/Space: 증감",
+      "입력 ArrowUp/ArrowDown: 증감",
+      "Home/End: 최소·최대값(상한이 있을 때)",
+      "Enter: 입력 확정",
+    ],
+    usage:
+      '<Stepper label="수량" value={quantity} onValueChange={setQuantity} min={0} max={10} />\n<Stepper label="간격" value={amount} onValueChange={setAmount} step={0.1} max={2} />',
+    Demo: StepperDemo,
+  }),
+  entry({
+    id: "slider",
+    name: "Slider",
+    summary: "범위 안의 숫자를 트랙과 키보드로 연속 조절합니다.",
+    contracts: [
+      "value/onValueChange 제어형. min=0, max=100, step=1이 기본이며 숫자 범위를 명시할 수 있습니다.",
+      "label과 native range 입력을 연결하며 valueText를 보이는 현재 값과 aria-valuetext에 사용합니다.",
+      "isDisabled는 포커스와 조작을 차단. description·error는 입력과 연결합니다.",
+      "트랙·thumb·선택 구간은 --gc-* 토큰을 사용해 Blue·Forest·다크·밀도에 대응합니다.",
+    ],
+    states: [
+      "기본",
+      "최소·최대",
+      "사용자 지정 범위·단위",
+      "비활성",
+      "키보드 포커스",
+    ],
+    keyboard: [
+      "Tab: 포커스",
+      "방향키: step 단위 증감",
+      "Home/End: 최소·최대",
+      "PageUp/PageDown: 브라우저 기본 범위 이동",
+    ],
+    usage:
+      '<Slider label="볼륨" value={volume} onValueChange={setVolume} valueText={`${volume}%`} />',
+    Demo: SliderDemo,
   }),
   entry({
     id: "text-area",
@@ -558,6 +694,7 @@ export const basicEntries: CatalogEntry[] = [
     name: "Checkbox",
     summary: "독립 선택과 전체 선택의 혼합 상태",
     contracts: [
+      "shouldHideLabel은 보이는 라벨만 숨기고 접근 가능한 이름을 유지합니다. 표의 선택 칸에도 같은 Checkbox를 사용합니다.",
       "label 클릭으로 값을 토글합니다.",
       "isMixed는 indeterminate로 전체 선택의 일부 선택 상태를 표현합니다. 20px 둥근 사각형에 체크 또는 혼합 마이너스를 표시합니다.",
       "네이티브 input 의미를 유지하며 고대비 환경에서는 브라우저 기본 외형으로 전환합니다.",

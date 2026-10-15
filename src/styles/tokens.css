@@ -59,6 +59,11 @@
   --gc-tab-count-size: 16px;
   --gc-tab-count-font-size: 10px;
   --gc-tab-badge-ring: 2px;
+  --gc-stepper-value-width: 64px;
+  --gc-accordion-duration: 240ms;
+  --gc-accordion-easing: cubic-bezier(0.22, 0.68, 0.3, 1);
+  --gc-slider-track-height: 6px;
+  --gc-slider-thumb-size: 20px;
 }
 [data-theme="forest"] {
   --gc-accent: #26714e;

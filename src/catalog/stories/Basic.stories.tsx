@@ -20,6 +20,8 @@ export const TextField: StoryObj = {
   render: () => renderExample("text-field"),
 };
 export const TextArea: StoryObj = { render: () => renderExample("text-area") };
+export const Stepper: StoryObj = { render: () => renderExample("stepper") };
+export const Slider: StoryObj = { render: () => renderExample("slider") };
 export const Checkbox: StoryObj = { render: () => renderExample("checkbox") };
 export const RadioGroup: StoryObj = {
   render: () => renderExample("radio-group"),

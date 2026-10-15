@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { Minus, Plus, X } from "lucide-react";
 import {
   useId,
   useState,
@@ -85,6 +85,12 @@ export type FieldProps = {
   description?: string;
   error?: string;
 };
+export function Input({
+  className = "",
+  ...props
+}: ComponentPropsWithRef<"input">) {
+  return <input {...props} className={`gc-input ${className}`} />;
+}
 export function TextField({
   label,
   description,
@@ -99,10 +105,9 @@ export function TextField({
         {label}
         {props.required && <span aria-hidden="true"> *</span>}
       </label>
-      <input
+      <Input
         {...props}
         id={id}
-        className="gc-input"
         aria-invalid={!!error}
         aria-describedby={error || description ? `${id}-help` : undefined}
       />
@@ -114,6 +119,195 @@ export function TextField({
     </div>
   );
 }
+export type StepperProps = FieldProps & {
+  value: number;
+  onValueChange: (value: number) => void;
+  min?: number;
+  max?: number;
+  step?: number;
+  isDisabled?: boolean;
+  isReadOnly?: boolean;
+  id?: string;
+  name?: string;
+};
+
+function decimalPlaces(value: number) {
+  const [base, exponent = "0"] = String(value).toLowerCase().split("e");
+  return Math.max(0, (base.split(".")[1]?.length ?? 0) - Number(exponent));
+}
+
+export function Stepper({
+  label,
+  value,
+  onValueChange,
+  min = 0,
+  max,
+  step = 1,
+  isDisabled = false,
+  isReadOnly = false,
+  description,
+  error,
+  id,
+  name,
+}: StepperProps) {
+  const generated = useId();
+  const inputId = id ?? generated;
+  const increment = Number.isFinite(step) && step > 0 ? step : 1;
+  const upperBound = Math.max(min, max ?? Infinity);
+  const precision = Math.min(
+    12,
+    Math.max(decimalPlaces(increment), decimalPlaces(min)),
+  );
+  const normalize = (next: number) => {
+    const aligned = min + Math.round((next - min) / increment) * increment;
+    return Math.min(
+      upperBound,
+      Math.max(min, Number(aligned.toFixed(precision))),
+    );
+  };
+  const currentValue = normalize(Number.isFinite(value) ? value : min);
+  const [draft, setDraft] = useState(() => String(currentValue));
+  useEffect(() => setDraft(String(currentValue)), [currentValue]);
+  const hasDraftNumber = draft.trim() !== "" && Number.isFinite(Number(draft));
+  const draftValue = hasDraftNumber ? normalize(Number(draft)) : currentValue;
+  const canDecrease = !isDisabled && !isReadOnly && draftValue > min;
+  const canIncrease = !isDisabled && !isReadOnly && draftValue < upperBound;
+  const apply = (next: number) => {
+    const normalized = normalize(next);
+    setDraft(String(normalized));
+    if (normalized !== value) onValueChange(normalized);
+  };
+  return (
+    <div className="gc-field gc-stepper">
+      <label htmlFor={inputId}>{label}</label>
+      <div
+        className="gc-stepper-control"
+        data-disabled={isDisabled || undefined}
+      >
+        <IconButton
+          label={`${label} 줄이기`}
+          disabled={!canDecrease}
+          onClick={() => apply(draftValue - increment)}
+        >
+          <Minus size={18} aria-hidden="true" />
+        </IconButton>
+        <Input
+          id={inputId}
+          name={name}
+          type="number"
+          inputMode="decimal"
+          className="gc-stepper-input"
+          value={draft}
+          min={min}
+          max={Number.isFinite(upperBound) ? upperBound : undefined}
+          step={increment}
+          disabled={isDisabled}
+          readOnly={isReadOnly}
+          aria-invalid={!!error}
+          aria-describedby={
+            error || description ? `${inputId}-help` : undefined
+          }
+          onChange={(event) => setDraft(event.target.value)}
+          onBlur={() => {
+            if (!isDisabled && !isReadOnly) apply(draftValue);
+          }}
+          onKeyDown={(event) => {
+            if (isDisabled || isReadOnly) return;
+            if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+              event.preventDefault();
+              apply(
+                draftValue + (event.key === "ArrowUp" ? increment : -increment),
+              );
+            } else if (
+              event.key === "Home" ||
+              (event.key === "End" && Number.isFinite(upperBound))
+            ) {
+              event.preventDefault();
+              apply(event.key === "Home" ? min : upperBound);
+            } else if (event.key === "Enter") {
+              event.preventDefault();
+              apply(draftValue);
+            }
+          }}
+        />
+        <IconButton
+          label={`${label} 늘리기`}
+          disabled={!canIncrease}
+          onClick={() => apply(draftValue + increment)}
+        >
+          <Plus size={18} aria-hidden="true" />
+        </IconButton>
+      </div>
+      {(error || description) && (
+        <small
+          id={`${inputId}-help`}
+          className={error ? "gc-error" : "gc-help"}
+        >
+          {error || description}
+        </small>
+      )}
+    </div>
+  );
+}
+
+export type SliderProps = FieldProps & {
+  value: number;
+  onValueChange: (value: number) => void;
+  min?: number;
+  max?: number;
+  step?: number;
+  valueText?: string;
+  isDisabled?: boolean;
+};
+export function Slider({
+  label,
+  value,
+  onValueChange,
+  min = 0,
+  max = 100,
+  step = 1,
+  valueText = String(value),
+  isDisabled = false,
+  description,
+  error,
+}: SliderProps) {
+  const id = useId();
+  const percentage =
+    max > min
+      ? Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100))
+      : 0;
+  return (
+    <div className="gc-field gc-slider">
+      <div className="gc-slider-heading">
+        <label htmlFor={id}>{label}</label>
+        <output htmlFor={id} aria-hidden="true">
+          {valueText}
+        </output>
+      </div>
+      <input
+        id={id}
+        className="gc-slider-input"
+        type="range"
+        value={value}
+        min={min}
+        max={max}
+        step={step}
+        disabled={isDisabled}
+        aria-valuetext={valueText}
+        aria-invalid={!!error}
+        aria-describedby={error || description ? `${id}-help` : undefined}
+        style={{ "--gc-slider-percentage": `${percentage}%` } as CSSProperties}
+        onChange={(event) => onValueChange(Number(event.target.value))}
+      />
+      {(error || description) && (
+        <small id={`${id}-help`} className={error ? "gc-error" : "gc-help"}>
+          {error || description}
+        </small>
+      )}
+    </div>
+  );
+}
+
 export function TextArea({
   label,
   description,
@@ -172,12 +366,14 @@ export function Checkbox({
   isChecked,
   isMixed = false,
   isDisabled = false,
+  shouldHideLabel = false,
   onCheckedChange,
 }: {
   label: string;
   isChecked: boolean;
   isMixed?: boolean;
   isDisabled?: boolean;
+  shouldHideLabel?: boolean;
   onCheckedChange: (isChecked: boolean) => void;
 }) {
   const ref = useRef<HTMLInputElement>(null);
@@ -194,7 +390,9 @@ export function Checkbox({
         disabled={isDisabled}
         onChange={(event) => onCheckedChange(event.target.checked)}
       />
-      {label}
+      <span className={shouldHideLabel ? "gc-sr-only" : undefined}>
+        {label}
+      </span>
     </label>
   );
 }

@@ -2,7 +2,12 @@ import { toastEntry } from "./toast";
 import { tabsEntry } from "./tabs";
 import { useState } from "react";
 import { Info } from "lucide-react";
-import { Button, IconButton, TextField } from "../components/basic";
+import {
+  Button,
+  IconButton,
+  Switch,
+  TextField,
+} from "../components/basic";
 import type { CatalogEntry } from "./types";
 import {
   Select,
@@ -200,32 +205,41 @@ function DrawerDemo() {
   );
 }
 function AccordionDemo() {
+  const [hasAnimation, setHasAnimation] = useState(true);
   return (
-    <Accordion
-      items={[
-        {
-          value: "one",
-          title: "여러 항목을 동시에 열 수 있나요?",
-          content: "네. 첫 버전은 여러 항목을 동시에 열고 닫을 수 있습니다.",
-        },
-        {
-          value: "two",
-          title: "내용에 링크나 버튼을 넣을 수 있나요?",
-          content: (
-            <>
-              <p>접힌 항목의 내부 버튼은 Tab으로 접근되지 않습니다.</p>
-              <Button>내부 액션 예제</Button>
-            </>
-          ),
-        },
-        {
-          value: "three",
-          title: "비활성 항목",
-          isDisabled: true,
-          content: "열 수 없습니다.",
-        },
-      ]}
-    />
+    <div className="gc-overlay-demo-column">
+      <Switch
+        label="애니메이션 사용"
+        isChecked={hasAnimation}
+        onCheckedChange={setHasAnimation}
+      />
+      <Accordion
+        hasAnimation={hasAnimation}
+        items={[
+          {
+            value: "one",
+            title: "여러 항목을 동시에 열 수 있나요?",
+            content: "네. 첫 버전은 여러 항목을 동시에 열고 닫을 수 있습니다.",
+          },
+          {
+            value: "two",
+            title: "내용에 링크나 버튼을 넣을 수 있나요?",
+            content: (
+              <>
+                <p>접힌 항목의 내부 버튼은 Tab으로 접근되지 않습니다.</p>
+                <Button>내부 액션 예제</Button>
+              </>
+            ),
+          },
+          {
+            value: "three",
+            title: "비활성 항목",
+            isDisabled: true,
+            content: "열 수 없습니다.",
+          },
+        ]}
+      />
+    </div>
   );
 }
 const migration = [
@@ -391,10 +405,18 @@ export const overlayEntries: CatalogEntry[] = [
       "제목은 실제 버튼",
       "접힌 내부 요소는 탐색에서 제외",
       "비활성 항목 지원",
+      "hasAnimation은 기본 true. 높이와 투명도를 240ms로 전환하고 false는 즉시 열고 닫기. prefers-reduced-motion에서는 애니메이션 제거",
     ],
-    ["열림", "닫힘", "여러 항목 열림", "비활성"],
+    [
+      "열림",
+      "닫힘",
+      "여러 항목 열림",
+      "비활성",
+      "애니메이션 켜기·끄기",
+      "모션 감소",
+    ],
     ["Enter/Space: 열고 닫기", "방향키/Home/End: 제목 이동"],
-    '<Accordion items={[{value:"faq",title:"질문",content:"답변"}]} />',
+    '<Accordion items={[{value:"faq",title:"질문",content:"답변"}]} hasAnimation />\n<Accordion items={items} hasAnimation={false} />',
     AccordionDemo,
   ),
   toastEntry,
