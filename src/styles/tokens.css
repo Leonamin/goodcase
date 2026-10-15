@@ -48,6 +48,17 @@
   --gc-press-duration: 80ms;
   --gc-press-scale: 0.96;
   --gc-press-easing: ease-out;
+  --gc-tab-icon-size: 20px;
+  --gc-tab-bottom-icon-size: 26px;
+  --gc-tab-transition: 300ms;
+  --gc-tab-easing: cubic-bezier(0.22, 0.68, 0.3, 1);
+  --gc-tab-panel-offset: 6px;
+  --gc-tab-segment-shadow: 0 1px 2px
+    color-mix(in srgb, var(--gc-overlay) 30%, transparent);
+  --gc-tab-dot-size: 6px;
+  --gc-tab-count-size: 16px;
+  --gc-tab-count-font-size: 10px;
+  --gc-tab-badge-ring: 2px;
 }
 [data-theme="forest"] {
   --gc-accent: #26714e;
