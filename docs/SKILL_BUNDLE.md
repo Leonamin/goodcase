@@ -28,7 +28,7 @@ pnpm dlx skills add Leonamin/goodcase --skill use-goodcase-ui -a codex -y
 
 개인 전체 프로젝트에서 쓰려면 `-g`를 추가한다. Claude Code에는 `-a claude-code`를 사용한다. 설치 범위와 에이전트 선택은 [Skills CLI 공식 문서](https://github.com/vercel-labs/skills#options)를 참고한다. 기존 설치를 갱신할 때는 변경한 파일을 먼저 보관한 뒤 같은 명령을 다시 실행한다.
 
-중앙 스킬 저장소 `Leonamin/leonamin-skills`의 기본 브랜치에 배포본이 반영되면 다음 명령도 동일하게 사용할 수 있다.
+중앙 스킬 저장소 `Leonamin/leonamin-skills`에서도 배포본을 제공한다. 다음 명령으로 설치할 수 있다. 두 저장소는 별도로 갱신되므로 같은 배포본인지 확인하려면 `manifest.json`의 버전과 내용 해시를 비교한다.
 
 ```sh
 pnpm dlx skills add Leonamin/leonamin-skills --skill use-goodcase-ui -a codex -y
@@ -55,12 +55,54 @@ $use-goodcase-ui로 설정 화면을 만들어줘.
 
 스킬 내부 경로는 SKILL.md가 있는 폴더를 기준으로 한다. AI는 목록에서 필요한 컴포넌트를 찾고 해당 설명과 export 위치부터 읽는다. 실제 UI에 필요한 외부 React/Radix/아이콘 패키지는 대상 프로젝트에 별도로 있어야 한다. 다른 프레임워크는 디자인과 동작 계약을 바탕으로 재구현한다.
 
-## 중앙 스킬 저장소에 배포본 내보내기
+## 두 저장소에 배포
 
-Goodcase 폴더에서 출력 경로를 지정한다. 폴더 위치는 사용자가 지정하며 스크립트에 개인 경로를 고정하지 않는다.
+Goodcase 원본 수정 → 배포본 생성·검증 → 두 저장소 반영 → 설치 확인 순서로 갱신한다. `leonamin-skills`의 스킬도 Goodcase에서 생성하며, 양쪽의 생성 파일을 따로 수정하지 않는다.
+
+### 1. Goodcase 배포본 생성
+
+코드나 계약을 바꾸는 릴리스는 `package.json` 버전도 갱신한다. Goodcase 저장소 루트에서 실행한다.
 
 ```sh
-pnpm build:skill --output ../leonamin-skills/use-goodcase-ui
+pnpm build
+pnpm build:skill
+pnpm test:skill
 ```
 
-중앙 저장소에는 생성된 `use-goodcase-ui` 폴더만 커밋한다. 원본 앱이나 node_modules를 옮기지 않는다. 두 저장소의 manifest.json 내용 해시를 비교하면 같은 배포본인지 확인할 수 있다. 설치된 스킬을 직접 수정하지 말고 Goodcase 원본 수정 → 배포본 생성 → 저장소 반영 순서로 갱신한다.
+### 2. 중앙 저장소에 같은 배포본 내보내기
+
+중앙 저장소가 없다면 Goodcase 밖의 별도 경로에 복제한다. 아래 `/absolute/path/to/leonamin-skills`는 사용할 실제 경로로 바꾼다. 이미 복제한 저장소나 별도 워크트리가 있다면 그 경로를 사용한다.
+
+```sh
+git clone https://github.com/Leonamin/leonamin-skills.git /absolute/path/to/leonamin-skills
+```
+
+Goodcase 저장소 루트에서 출력 경로를 지정하고 결과를 비교한다.
+
+```sh
+SKILLS_REPO=/absolute/path/to/leonamin-skills
+pnpm build:skill --output "$SKILLS_REPO/use-goodcase-ui"
+diff -qr skills/use-goodcase-ui "$SKILLS_REPO/use-goodcase-ui"
+git -C "$SKILLS_REPO" diff --stat -- use-goodcase-ui
+```
+
+`diff`에 출력이 없고 종료 코드가 0이면 두 폴더가 같다. `manifest.json`의 버전과 `contentHash`로도 배포본을 식별할 수 있다. `--output`은 지정한 스킬 폴더에 쓰며, ZIP은 계속 Goodcase의 `artifacts/use-goodcase-ui.zip`에 생성한다.
+
+폴더 위치는 스크립트에 고정하지 않는다. `../leonamin-skills/use-goodcase-ui` 같은 상대 경로는 두 저장소가 나란히 있을 때만 사용하고, 별도 워크트리에서는 실제 작업본의 절대 경로를 지정한다.
+
+### 3. 변경 검토와 GitHub 반영
+
+각 저장소의 작업 브랜치에서 아래 변경을 검토·커밋하고 push한 뒤, 기본 브랜치로 PR을 반영한다. 커밋 전 staged diff를 확인하고 Conventional Commits 형식을 사용한다.
+
+| 저장소            | 반영할 파일                                                  | 설치 출처                  |
+| ----------------- | ------------------------------------------------------------ | -------------------------- |
+| `goodcase`        | 변경한 원본, 릴리스 버전, 재생성한 `skills/use-goodcase-ui/` | `Leonamin/goodcase`        |
+| `leonamin-skills` | 재생성한 루트 `use-goodcase-ui/` 전체                        | `Leonamin/leonamin-skills` |
+
+중앙 저장소에는 Goodcase 앱이나 `node_modules`를 옮기지 않는다. 생성 명령은 GitHub 반영을 수행하지 않으며, 한쪽 저장소 반영으로 다른 쪽이 자동 갱신되지는 않는다.
+
+### 4. 설치 확인과 사용자 갱신
+
+기본 브랜치에 반영한 뒤 빈 임시 프로젝트에서 [설치 명령](#다른-프로젝트에-설치)을 출처별로 실행한다. `.agents/skills/use-goodcase-ui/`에 `SKILL.md`, `references/`, `assets/`, `manifest.json`이 설치되는지 확인하고 배포본의 버전과 내용 해시를 비교한다.
+
+기존 사용자 설치본도 별도로 갱신한다. 수정한 설치 파일을 먼저 보관한 뒤 선택한 출처의 설치 명령을 다시 실행한다. 수동 배포는 ZIP 안의 `use-goodcase-ui/` 전체를 전달한다.
