@@ -61,6 +61,7 @@ export const foundationEntries: CatalogEntry[] = [
       "--gc-* 의미 토큰을 프로젝트 변수에 연결해 외형을 변경합니다.",
       "Portal 콘텐츠도 같은 토큰을 읽도록 문서 범위 또는 Portal 컨테이너에 테마를 공급합니다.",
       "테마와 밀도는 동작을 바꾸지 않습니다.",
+      "Blue·Forest는 강조색만 바꾸고 모서리 반경을 유지합니다. 모서리는 --gc-radius-*로 별도 조정합니다.",
     ],
     states: [
       "Blue 기본 테마",
