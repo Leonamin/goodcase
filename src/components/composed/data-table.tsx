@@ -11,22 +11,8 @@ export type DataColumn<T> = {
   render: (row: T) => ReactNode;
   compare?: (a: T, b: T) => number;
 };
-export function DataTable<T = DataRow>({
-  rows,
-  columns,
-  getRowId,
-  caption = "데이터 목록",
-  isSortable = true,
-  isSelectable = true,
-  isLoading,
-  isRefreshing,
-  error,
-  onRetry,
-  pageSize = 3,
-}: {
+type DataTableStateProps<T> = {
   rows: T[];
-  columns?: DataColumn<T>[];
-  getRowId?: (row: T) => string;
   caption?: string;
   isSortable?: boolean;
   isSelectable?: boolean;
@@ -35,18 +21,64 @@ export function DataTable<T = DataRow>({
   error?: string;
   onRetry: () => void;
   pageSize?: number;
-}) {
-  const activeColumns: DataColumn<T>[] = columns || [
-    {
-      id: "name",
-      label: "이름",
-      render: (row) => (row as DataRow).name,
-      compare: (a, b) =>
-        (a as DataRow).name.localeCompare((b as DataRow).name, "ko"),
-    },
-    { id: "status", label: "상태", render: (row) => (row as DataRow).status },
-  ];
-  const rowId = getRowId || ((row: T) => (row as DataRow).id);
+};
+
+export type DataTableProps<T> = DataTableStateProps<T> & {
+  columns: DataColumn<T>[];
+  getRowId: (row: T) => string;
+};
+
+type DefaultDataTableProps = DataTableStateProps<DataRow> & {
+  columns?: DataColumn<DataRow>[];
+  getRowId?: (row: DataRow) => string;
+};
+
+const defaultColumns: DataColumn<DataRow>[] = [
+  {
+    id: "name",
+    label: "이름",
+    render: (row) => row.name,
+    compare: (a, b) => a.name.localeCompare(b.name, "ko"),
+  },
+  { id: "status", label: "상태", render: (row) => row.status },
+];
+
+function getDefaultRowId(row: DataRow) {
+  return row.id;
+}
+
+function hasCustomModel<T>(
+  props: DefaultDataTableProps | DataTableProps<T>,
+): props is DataTableProps<T> {
+  return props.columns !== undefined && props.getRowId !== undefined;
+}
+
+export function DataTable(props: DefaultDataTableProps): ReactNode;
+export function DataTable<T>(props: DataTableProps<T>): ReactNode;
+export function DataTable<T>(props: DefaultDataTableProps | DataTableProps<T>) {
+  if (hasCustomModel(props)) return <DataTableModel {...props} />;
+  return (
+    <DataTableModel
+      {...props}
+      columns={props.columns ?? defaultColumns}
+      getRowId={props.getRowId ?? getDefaultRowId}
+    />
+  );
+}
+
+function DataTableModel<T>({
+  rows,
+  columns: activeColumns,
+  getRowId: rowId,
+  caption = "데이터 목록",
+  isSortable = true,
+  isSelectable = true,
+  isLoading,
+  isRefreshing,
+  error,
+  onRetry,
+  pageSize = 3,
+}: DataTableProps<T>) {
   const [page, setPage] = useState(1);
   const [sortId, setSortId] = useState(
     activeColumns.find((column) => column.compare)?.id || "",
@@ -75,7 +107,7 @@ export function DataTable<T = DataRow>({
   useEffect(() => {
     setPage(1);
     setSelectedIds([]);
-  }, [rows]);
+  }, [rows, pageSize]);
   function move(next: number) {
     setPage(next);
     setSelectedIds([]);
