@@ -363,3 +363,43 @@ test("reduced motion skips selection and panel animations for every variant", as
     ).toBe(0);
   }
 });
+
+test("underline stays above hovered and focused tabs without intercepting selection", async ({
+  page,
+}) => {
+  await page.goto("/?component=tabs");
+  const list = page.getByRole("tablist", { name: "기본 탭 예제" });
+  const indicator = list.locator(".gc-tabs-indicator");
+  // Include the decorative layer in hit testing to observe actual browser paint order.
+  const isUnderlineOnTop = () =>
+    indicator.evaluate((el) => {
+      const element = el as HTMLElement;
+      const rect = element.getBoundingClientRect();
+      element.style.pointerEvents = "auto";
+      const isOnTop =
+        document.elementFromPoint(rect.x + rect.width / 2, rect.bottom - 1) ===
+        element;
+      element.style.removeProperty("pointer-events");
+      return isOnTop;
+    });
+  for (const tab of [
+    list.getByRole("tab").nth(0),
+    list.getByRole("tab").nth(1),
+  ]) {
+    await tab.click();
+    await expect(tab).toHaveAttribute("aria-selected", "true");
+    await expect(indicator).toHaveCSS("pointer-events", "none");
+    await expect.poll(isUnderlineOnTop).toBe(true);
+    await tab.hover();
+    await tab.focus();
+    await expect(tab).toBeFocused();
+    await expect.poll(isUnderlineOnTop).toBe(true);
+  }
+  // Negative control: the former stacking order hides the underline behind the tab.
+  await indicator.evaluate((el) => ((el as HTMLElement).style.zIndex = "auto"));
+  expect(await isUnderlineOnTop()).toBe(false);
+  await indicator.evaluate((el) =>
+    (el as HTMLElement).style.removeProperty("z-index"),
+  );
+  expect(await isUnderlineOnTop()).toBe(true);
+});
