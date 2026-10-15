@@ -9,3 +9,7 @@ playwright-report
 work/
 artifacts/use-goodcase-ui/
 artifacts/use-goodcase-ui.zip
+
+# Local skill installation; canonical bundle is tracked in skills/use-goodcase-ui/
+/.agents/skills/use-goodcase-ui/
+/skills-lock.json
