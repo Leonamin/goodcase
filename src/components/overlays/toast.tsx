@@ -10,7 +10,7 @@ import {
 } from "react";
 import { Toast as RToast } from "radix-ui";
 import { Check, Info, TriangleAlert, CircleAlert, X } from "lucide-react";
-import { Button, IconButton } from "../basic";
+import { Button, IconButton } from "../basic/button";
 export type ToastMessage = {
   title: string;
   description?: string;

@@ -12,8 +12,11 @@ function violations(file, source) {
     ts.ScriptKind.TSX,
   );
   const findings = [];
-  const isGallery = file === "src/App.tsx" || file.startsWith("src/catalog/");
-  const isComposed = file === "src/components/composed/index.tsx";
+  const isGallery =
+    file === "src/App.tsx" ||
+    file.startsWith("src/catalog/") ||
+    file.startsWith("src/gallery/");
+  const isComposed = file.startsWith("src/components/composed/");
   if (!isGallery && !isComposed) return findings;
   const visit = (node) => {
     if (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) {
@@ -28,7 +31,7 @@ function violations(file, source) {
         tag === "button" &&
         literal("data-interaction-exception") === '"sidebar-backdrop"';
       const isHiddenFileInput =
-        isComposed &&
+        file === "src/components/composed/file-uploader.tsx" &&
         tag === "input" &&
         literal("type") === '"file"' &&
         attrs.some(
@@ -63,7 +66,7 @@ async function sourceFiles(directory) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
     const path = `${directory}/${entry.name}`;
     if (entry.isDirectory()) files.push(...(await sourceFiles(path)));
-    else if (path.endsWith(".tsx")) files.push(path);
+    else if (/\.tsx?$/.test(path)) files.push(path);
   }
   return files;
 }
@@ -99,14 +102,38 @@ test("policy rejects native controls and clickable containers, and keeps excepti
   );
   assert.equal(
     violations(
-      "src/components/composed/index.tsx",
+      "src/components/composed/file-uploader.tsx",
       '<input type="file" hidden/>',
     ).length,
     0,
   );
   assert.equal(
-    violations("src/components/composed/index.tsx", '<input type="file"/>')
-      .length,
+    violations(
+      "src/components/composed/file-uploader.tsx",
+      '<input type="file"/>',
+    ).length,
     1,
   );
+  assert.equal(
+    violations(
+      "src/components/composed/form-field.tsx",
+      '<input type="file" hidden/>',
+    ).length,
+    1,
+  );
+});
+
+test("component implementations import direct modules rather than family barrels", async () => {
+  const files = await sourceFiles("src/components");
+  const findings = [];
+  for (const file of files) {
+    if (/\/index\.tsx?$/.test(file)) continue;
+    const source = await readFile(file, "utf8");
+    for (const { fileName } of ts.preProcessFile(source, true, true)
+      .importedFiles) {
+      if (/^(?:\.\.\/)+(?:basic|overlays|composed)(?:\/index)?$/.test(fileName))
+        findings.push(`${file}: ${fileName}`);
+    }
+  }
+  assert.deepEqual(findings, []);
 });
