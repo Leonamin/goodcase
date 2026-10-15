@@ -356,6 +356,7 @@ export const overlayEntries: CatalogEntry[] = [
     [
       "제목과 접근 가능한 닫기 버튼 제공",
       "포커스는 내부에 유지, 닫으면 호출 요소로 복귀",
+      "내부 검색 선택창을 닫는 동안에도 Tab/Shift+Tab은 처음·마지막 요소 사이에서 즉시 순환. 비활성·숨김·inert 요소는 제외하고 포털로 열린 하위 패널은 자체 키보드 탐색 유지",
       "본문은 포커스 링용 안전 여백을 갖고 자식 사이 간격을 제공합니다. 내부 폼 그룹에도 --gc-focus-clearance 이상의 패딩과 간격을 두며 overflow로 링을 자르지 않습니다.",
       "기본은 Escape·바깥 클릭 닫기",
       "shouldCloseOnOutsideClick, shouldCloseOnEscape로 닫기 규칙 지정",
