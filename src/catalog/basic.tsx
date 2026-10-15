@@ -301,6 +301,72 @@ function AlertDemo() {
     </div>
   );
 }
+function SpinnerDemo() {
+  return (
+    <div className="gc-spinner-demo">
+      <div className="gc-spinner-demo-variants">
+        {(
+          [
+            {
+              variant: "ring",
+              title: "Ring · 원형 선",
+              note: "둥근 끝의 원형 선이 일정한 속도로 회전합니다.",
+              label: "원형 선 스피너",
+            },
+            {
+              variant: "orbit",
+              title: "Orbit · 여러 원의 공전",
+              note: "작은 원 4개가 1.2·1.6·2.1·2.7초 주기로 각각 회전합니다.",
+              label: "다중 원 스피너",
+            },
+          ] as const
+        ).map(({ variant, title, note, label }) => (
+          <section key={variant} className="gc-spinner-demo-variant">
+            <h2>{title}</h2>
+            <p className="gc-muted">{note}</p>
+            <B.Spinner variant={variant} size="large" label={label} />
+            <div
+              className="gc-spinner-demo-samples"
+              aria-label={`${title} 크기 비교`}
+            >
+              {(["small", "medium", "large"] as const).map((size) => (
+                <div key={size} className="gc-stack">
+                  <B.Spinner
+                    variant={variant}
+                    size={size}
+                    tone="muted"
+                    isDecorative
+                  />
+                  <span className="gc-muted">
+                    {size === "small"
+                      ? "16px"
+                      : size === "medium"
+                        ? "32px"
+                        : "48px"}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <B.Button disabled>
+              <B.Spinner
+                variant={variant}
+                size="small"
+                tone="inherit"
+                isDecorative
+              />{" "}
+              처리 중
+            </B.Button>
+          </section>
+        ))}
+      </div>
+      <p className="gc-muted">
+        진행률을 계산하지 않는 로딩 표시입니다. 버튼 안에서는 장식형으로
+        사용하며, 모션 감소 설정에서는 회전을 멈춥니다.
+      </p>
+    </div>
+  );
+}
+
 function SkeletonDemo() {
   const [isLoading, setIsLoading] = useState(true);
   return (
@@ -763,6 +829,30 @@ export const basicEntries: CatalogEntry[] = [
     usage:
       '<Alert title="저장 실패" tone="danger">입력 내용은 유지했어요.</Alert>',
     Demo: AlertDemo,
+  }),
+  entry({
+    id: "spinner",
+    name: "Spinner",
+    summary: "원형 선과 속도가 다른 여러 원으로 불확정 로딩을 표시합니다.",
+    contracts: [
+      'variant="ring"(기본)은 둥근 끝의 원형 선이 800ms 주기로 회전합니다. variant="orbit"은 작은 원 4개가 각각 1200·1600·2100·2700ms 주기로 공전합니다.',
+      "size는 small=16px, medium=32px(기본), large=48px. tone은 accent(기본), muted, inherit이며 --gc-* 토큰을 사용합니다.",
+      "기본은 role=status와 label(기본 불러오는 중)로 작업 상태를 안내합니다. 진행률·남은 시간을 추정하지 않으며 표시 여부는 호출부가 결정합니다.",
+      "isDecorative=true는 role과 안내 텍스트를 제외하고 aria-hidden을 적용합니다. 버튼·다른 상태 안내 안에 중복 배치할 때 사용합니다.",
+      "포커스나 사용자 조작이 없는 표시 요소입니다. prefers-reduced-motion에서는 회전을 멈추고 원형 선·각 원의 정적인 배치와 상태 안내를 유지합니다.",
+    ],
+    states: [
+      "원형 선",
+      "여러 원의 독립 회전",
+      "16px·32px·48px",
+      "강조·보조·상속 색상",
+      "장식형",
+      "모션 감소",
+    ],
+    keyboard: ["포커스 대상 아님"],
+    usage:
+      '<Spinner label="목록을 불러오는 중" />\n<Spinner variant="orbit" size="large" label="이미지를 준비하는 중" />\n<Button disabled><Spinner size="small" tone="inherit" isDecorative /> 처리 중</Button>',
+    Demo: SpinnerDemo,
   }),
   entry({
     id: "skeleton",

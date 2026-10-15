@@ -21,6 +21,7 @@ const ids = [
   "badge",
   "alert",
   "skeleton",
+  "spinner",
   "progress",
   "image",
   "avatar",

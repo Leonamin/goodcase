@@ -64,6 +64,16 @@
   --gc-accordion-easing: cubic-bezier(0.22, 0.68, 0.3, 1);
   --gc-slider-track-height: 6px;
   --gc-slider-thumb-size: 20px;
+  --gc-spinner-size-small: 16px;
+  --gc-spinner-size-medium: 32px;
+  --gc-spinner-size-large: 48px;
+  --gc-spinner-stroke: 3;
+  --gc-spinner-track-opacity: 0.16;
+  --gc-spinner-ring-duration: 800ms;
+  --gc-spinner-orbit-duration-1: 1200ms;
+  --gc-spinner-orbit-duration-2: 1600ms;
+  --gc-spinner-orbit-duration-3: 2100ms;
+  --gc-spinner-orbit-duration-4: 2700ms;
 }
 [data-theme="forest"] {
   --gc-accent: #26714e;
