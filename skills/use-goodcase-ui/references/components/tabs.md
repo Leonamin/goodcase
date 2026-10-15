@@ -42,12 +42,8 @@
 ## 포함 코드와 공유 스타일
 
 - assets/src/components/overlays/tabs.tsx
-- assets/src/styles/basic.css
-- assets/src/styles/composed.css
 - assets/src/styles/global.css
-- assets/src/styles/overlays.css
 - assets/src/styles/tabs.css
-- assets/src/styles/toast.css
 - assets/src/styles/tokens.css
 
 상대 import와 공유 모듈의 다른 export 때문에 직접 사용하는 컴포넌트보다 범위가 넓을 수 있습니다.
@@ -85,6 +81,8 @@ radix-ui, react, react-dom
 ## 사용 예제
 
 ```tsx
+import { Tabs } from "./components/overlays/tabs";
+
 <Tabs items={items} defaultValue="overview" />
 <Tabs variant="adaptive" label="작업 탭" items={items} value={tab} onValueChange={setTab} />
 // item: { value, label, content, icon?, badge?: number | "dot", badgeMax?: 99 | 999, isDisabled? }

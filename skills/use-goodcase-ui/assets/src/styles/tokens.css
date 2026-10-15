@@ -29,6 +29,8 @@
   --gc-focus-clearance: 6px;
   --gc-toast-control-size: 24px;
   --gc-toast-title-line-height: 24px;
+  --gc-toast-enter-duration: 180ms;
+  --gc-toast-exit-duration: 180ms;
   --gc-radius-sm: 6px;
   --gc-radius: 10px;
   --gc-radius-lg: 16px;
