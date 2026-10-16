@@ -145,6 +145,29 @@
   border-radius: calc(var(--gc-radius) - 1px);
   color: var(--gc-text);
 }
+/* Keep the compact hit area stable and make the small glyph's press visible. */
+.gc-stepper-control > .gc-icon-button:active:not(:disabled) {
+  scale: 1;
+}
+.gc-stepper-control > .gc-icon-button > .gc-button-content {
+  scale: 1;
+  transition: scale var(--gc-press-duration) var(--gc-press-easing);
+}
+.gc-stepper-control
+  > .gc-icon-button:active:not(:disabled)
+  > .gc-button-content {
+  scale: var(--gc-stepper-icon-press-scale);
+}
+@media (prefers-reduced-motion: reduce) {
+  .gc-stepper-control > .gc-icon-button > .gc-button-content {
+    transition: none;
+  }
+  .gc-stepper-control
+    > .gc-icon-button:active:not(:disabled)
+    > .gc-button-content {
+    scale: 1;
+  }
+}
 .gc-stepper-control > .gc-icon-button:focus-visible,
 .gc-stepper-input:focus-visible {
   position: relative;
@@ -222,6 +245,12 @@
   border: 2px solid var(--gc-control-border);
   background: var(--gc-surface);
   position: relative;
+  scale: 1;
+  transition: scale var(--gc-press-duration) var(--gc-press-easing);
+}
+.gc-choice:active > :is(.gc-checkbox-input, .gc-radio-input):not(:disabled),
+:is(.gc-checkbox-input, .gc-radio-input):active:not(:disabled) {
+  scale: var(--gc-press-scale);
 }
 .gc-checkbox-input {
   border-radius: var(--gc-radius-sm);
@@ -300,13 +329,20 @@
   height: 18px;
   border-radius: 50%;
   background: var(--gc-surface);
-  transition: transform var(--gc-duration);
+  scale: 1;
+  transition:
+    translate var(--gc-duration),
+    scale var(--gc-press-duration) var(--gc-press-easing);
+}
+.gc-choice:active > .gc-switch:not(:disabled):before,
+.gc-switch:active:not(:disabled):before {
+  scale: var(--gc-press-scale);
 }
 .gc-switch:checked {
   background: var(--gc-accent) !important;
 }
 .gc-switch:checked:before {
-  transform: translateX(16px);
+  translate: 16px;
 }
 .gc-badge {
   display: inline-flex;
@@ -822,6 +858,7 @@
 }
 .gc-slider-input {
   appearance: none;
+  touch-action: none;
   width: 100%;
   min-width: 0;
   height: var(--gc-control-height);
@@ -859,6 +896,8 @@
   border-radius: 50%;
   background: var(--gc-accent);
   box-shadow: 0 0 0 1px var(--gc-accent);
+  scale: 1;
+  transition: scale var(--gc-press-duration) var(--gc-press-easing);
 }
 .gc-slider-input::-moz-range-thumb {
   width: var(--gc-slider-thumb-size);
@@ -868,6 +907,14 @@
   border-radius: 50%;
   background: var(--gc-accent);
   box-shadow: 0 0 0 1px var(--gc-accent);
+  scale: 1;
+  transition: scale var(--gc-press-duration) var(--gc-press-easing);
+}
+.gc-slider-input[data-dragging]:not(:disabled)::-webkit-slider-thumb {
+  scale: var(--gc-slider-thumb-active-scale);
+}
+.gc-slider-input[data-dragging]:not(:disabled)::-moz-range-thumb {
+  scale: var(--gc-slider-thumb-active-scale);
 }
 .gc-slider-input:disabled {
   opacity: 0.5;
@@ -880,5 +927,19 @@
 @media (prefers-reduced-motion: reduce) {
   .gc-button:active:not(:disabled) {
     scale: 1;
+  }
+  .gc-checkbox-input,
+  .gc-radio-input,
+  .gc-switch:before {
+    scale: 1 !important;
+    transition: none !important;
+  }
+  .gc-slider-input::-webkit-slider-thumb {
+    scale: 1 !important;
+    transition: none !important;
+  }
+  .gc-slider-input::-moz-range-thumb {
+    scale: 1 !important;
+    transition: none !important;
   }
 }

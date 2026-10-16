@@ -47,6 +47,10 @@
   --gc-text-lg: 20px;
   --gc-text-title: 34px;
   --gc-duration: 140ms;
+  --gc-drawer-enter-duration: 250ms;
+  --gc-drawer-exit-duration: 200ms;
+  --gc-drawer-enter-easing: cubic-bezier(0.16, 1, 0.3, 1);
+  --gc-drawer-exit-easing: ease-in;
   --gc-press-duration: 80ms;
   --gc-press-scale: 0.96;
   --gc-press-easing: ease-out;
@@ -62,10 +66,12 @@
   --gc-tab-count-font-size: 10px;
   --gc-tab-badge-ring: 2px;
   --gc-stepper-value-width: 64px;
+  --gc-stepper-icon-press-scale: 0.88;
   --gc-accordion-duration: 240ms;
   --gc-accordion-easing: cubic-bezier(0.22, 0.68, 0.3, 1);
   --gc-slider-track-height: 6px;
   --gc-slider-thumb-size: 20px;
+  --gc-slider-thumb-active-scale: 1.2;
   --gc-spinner-size-small: 16px;
   --gc-spinner-size-medium: 32px;
   --gc-spinner-size-large: 48px;

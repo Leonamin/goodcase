@@ -399,10 +399,12 @@ export const overlayEntries: CatalogEntry[] = [
     summary: "긴 상세·보조 작업을 화면 가장자리에 표시합니다.",
     contracts: [
       "Dialog와 같은 모달 포커스 계약",
-      "데스크톱 측면·모바일 하단 배치",
-      "본문만 스크롤, footer 액션 유지",
+      "데스크톱은 오른쪽, 모바일은 아래에서 슬라이드. 열기 250ms·닫기 200ms, 배경막은 동시에 페이드",
+      "닫기 전환이 끝난 뒤 제거, 전환 중 상태 변경은 현재 위치에서 이어짐",
+      "prefers-reduced-motion에서는 이동·페이드 없이 즉시 전환",
+      "본문만 스크롤하고 스크롤바는 기본 숨김. 휠·터치·키보드 스크롤과 footer 액션 유지",
     ],
-    states: ["닫힘", "열림", "긴 본문", "모바일 하단"],
+    states: ["닫힘", "열림", "열기·닫기 전환", "긴 본문", "모바일 하단"],
     keyboard: ["Tab: 내부 이동", "Escape: 닫기"],
     usage:
       'import { Drawer } from "./components/overlays/dialog";\nimport { Button } from "./components/basic/button";\n\n<Drawer trigger={<Button>상세</Button>} title="상세" footer={actions}>{content}</Drawer>',

@@ -8,6 +8,7 @@
 - label과 native range 입력을 연결하며 valueText를 보이는 현재 값과 aria-valuetext에 사용합니다.
 - isDisabled는 포커스와 조작을 차단. description·error는 입력과 연결합니다.
 - 트랙·thumb·선택 구간은 --gc-* 토큰을 사용해 Blue·Forest·다크·밀도에 대응합니다.
+- 포인터로 잡고 있는 동안 손잡이만 80ms로 1.2배 확대하고 놓으면 복귀합니다. 비활성·모션 감소 설정에서는 확대하지 않습니다.
 - 외부 포커스 링이 잘리거나 인접 요소를 가리지 않도록 부모 배치에 --gc-focus-clearance(기본 6px) 이상의 안전 여백·간격을 확보합니다.
 
 ## 상태
@@ -55,7 +56,7 @@ react, react-dom
 ## 코드 위치
 
 - SliderProps: assets/src/components/basic/slider.tsx:4-12
-- Slider: assets/src/components/basic/slider.tsx:13-60
+- Slider: assets/src/components/basic/slider.tsx:13-71
 
 ## 이식
 

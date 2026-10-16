@@ -696,6 +696,7 @@ export const basicEntries: CatalogEntry[] = [
     contracts: [
       "value/onValueChange 제어형. min은 기본 0, step은 기본 1이며 max로 상한을 지정합니다.",
       "기존 IconButton과 숫자 입력을 한 컨트롤로 조합. 최소·최대값에서는 해당 증감 버튼만 비활성화합니다.",
+      "증감 버튼은 클릭 영역을 유지하고 ± 아이콘만 80ms·0.88배로 축소해 눌림을 표시합니다. 비활성·읽기 전용과 모션 감소 설정에서는 축소하지 않습니다.",
       "직접 입력 중에만 draft를 유지합니다. Enter·포커스 이동·증감 조작은 변경을 요청하고 확정 표시는 부모 value를 따릅니다. 부모가 요청을 거절하거나 지연하면 미승인 값은 표시하지 않습니다. 빈 입력은 부모 값으로 복원합니다.",
       "소수·지수 step은 십진 정밀도를 유지합니다. step은 양수, value/min/max는 유효한 숫자로 전달합니다. 상한이 step에 맞지 않으면 min 기준으로 max 이하의 마지막 step 값이 유효 상한입니다(0~10, step=3이면 9). 직접 입력·버튼·End가 같은 정책을 사용합니다.",
       "label과 입력·설명을 연결하며 error는 aria-invalid로 안내. isReadOnly는 값 확인·선택 가능, isDisabled는 모든 조작 차단.",
@@ -730,6 +731,7 @@ export const basicEntries: CatalogEntry[] = [
       "label과 native range 입력을 연결하며 valueText를 보이는 현재 값과 aria-valuetext에 사용합니다.",
       "isDisabled는 포커스와 조작을 차단. description·error는 입력과 연결합니다.",
       "트랙·thumb·선택 구간은 --gc-* 토큰을 사용해 Blue·Forest·다크·밀도에 대응합니다.",
+      "포인터로 잡고 있는 동안 손잡이만 80ms로 1.2배 확대하고 놓으면 복귀합니다. 비활성·모션 감소 설정에서는 확대하지 않습니다.",
     ],
     states: [
       "기본",
@@ -770,6 +772,7 @@ export const basicEntries: CatalogEntry[] = [
     contracts: [
       "shouldHideLabel은 보이는 라벨만 숨기고 접근 가능한 이름을 유지합니다. 표의 선택 칸에도 같은 Checkbox를 사용합니다.",
       "label 클릭으로 값을 토글합니다.",
+      "입력 또는 label을 누르는 동안 선택 표시만 Button과 같은 80ms·0.96배로 축소합니다. 비활성·모션 감소 설정에서는 축소하지 않습니다.",
       "isMixed는 indeterminate로 전체 선택의 일부 선택 상태를 표현합니다. 20px 둥근 사각형에 체크 또는 혼합 마이너스를 표시합니다.",
       "네이티브 input 의미를 유지하며 고대비 환경에서는 브라우저 기본 외형으로 전환합니다.",
       "선택값은 호출부가 보유하며 onCheckedChange로 변경 요청을 전달합니다.",
@@ -788,6 +791,7 @@ export const basicEntries: CatalogEntry[] = [
       "fieldset·legend로 선택 그룹을 설명합니다.",
       "공유된 고유 name으로 하나만 선택합니다. 20px 원형·2px 테두리와 선택점으로 표시하며 네이티브 방향키 동작을 유지합니다.",
       "옵션과 값은 호출부에서 전달합니다.",
+      "입력 또는 label을 누르는 동안 원형 선택 표시만 Button과 같은 80ms·0.96배로 축소합니다. 비활성·모션 감소 설정에서는 축소하지 않습니다.",
     ],
     states: ["미선택", "선택", "그룹 비활성"],
     keyboard: ["Tab으로 그룹 이동", "방향키로 선택 이동", "Space로 선택"],
@@ -802,6 +806,7 @@ export const basicEntries: CatalogEntry[] = [
     contracts: [
       "상태가 바뀌어도 label은 유지합니다.",
       'role="switch"와 checked로 설정 상태를 전달합니다.',
+      "입력 또는 label을 누르는 동안 원형 손잡이만 Button과 같은 80ms·0.96배로 축소합니다. 켜짐·꺼짐 이동과 함께 동작하며 비활성·모션 감소 설정에서는 축소하지 않습니다.",
       "저장·실패·처리 중 상태는 호출부에서 전달하며 즉시 저장을 추측하지 않습니다.",
     ],
     states: ["켜짐", "꺼짐", "비활성"],
