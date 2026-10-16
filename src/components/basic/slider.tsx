@@ -1,4 +1,4 @@
-import { useId, type CSSProperties } from "react";
+import { useId, useState, type CSSProperties } from "react";
 import type { FieldProps } from "./field";
 
 export type SliderProps = FieldProps & {
@@ -23,6 +23,7 @@ export function Slider({
   error,
 }: SliderProps) {
   const id = useId();
+  const [isDragging, setIsDragging] = useState(false);
   const percentage =
     max > min
       ? Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100))
@@ -44,6 +45,16 @@ export function Slider({
         max={max}
         step={step}
         disabled={isDisabled}
+        data-dragging={(isDragging && !isDisabled) || undefined}
+        onPointerDown={(event) => {
+          if (isDisabled || !event.isPrimary || event.button !== 0) return;
+          event.currentTarget.setPointerCapture(event.pointerId);
+          setIsDragging(true);
+        }}
+        onPointerUp={() => setIsDragging(false)}
+        onPointerCancel={() => setIsDragging(false)}
+        onLostPointerCapture={() => setIsDragging(false)}
+        onBlur={() => setIsDragging(false)}
         aria-valuetext={valueText}
         aria-invalid={!!error}
         aria-describedby={error || description ? `${id}-help` : undefined}

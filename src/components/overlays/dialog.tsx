@@ -70,7 +70,9 @@ function Modal({
     <RDialog.Root open={isOpen} onOpenChange={onOpenChange}>
       {trigger && <RDialog.Trigger asChild>{trigger}</RDialog.Trigger>}
       <RDialog.Portal>
-        <RDialog.Overlay className="gc-modal-overlay" />
+        <RDialog.Overlay
+          className={`gc-modal-overlay${isDrawer ? " gc-drawer-overlay" : ""}`}
+        />
         <RDialog.Content
           className={`gc-modal ${isDrawer ? "gc-drawer" : ""} ${className ?? ""}`}
           {...(!description ? { "aria-describedby": undefined } : {})}

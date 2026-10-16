@@ -210,18 +210,66 @@
   border-top: 1px solid var(--gc-border);
   flex-shrink: 0;
 }
+.gc-drawer-overlay {
+  opacity: 1;
+  transition: opacity var(--gc-drawer-enter-duration)
+    var(--gc-drawer-enter-easing);
+}
 .gc-drawer {
+  --gc-drawer-offset-x: 100%;
+  --gc-drawer-offset-y: 0%;
   left: auto;
   right: 0;
   top: 0;
-  transform: none;
+  transform: translate(0, 0);
+  transition: transform var(--gc-drawer-enter-duration)
+    var(--gc-drawer-enter-easing);
   width: min(420px, 100vw);
   height: 100dvh;
   max-height: 100dvh;
   border-radius: var(--gc-radius-lg) 0 0 var(--gc-radius-lg);
 }
+.gc-drawer[data-state="closed"] {
+  transform: translate(var(--gc-drawer-offset-x), var(--gc-drawer-offset-y));
+}
+.gc-drawer-overlay[data-state="closed"] {
+  opacity: 0;
+}
+.gc-drawer[data-state="closed"],
+.gc-drawer-overlay[data-state="closed"] {
+  transition-duration: var(--gc-drawer-exit-duration);
+  transition-timing-function: var(--gc-drawer-exit-easing);
+  /* Radix Presence waits for CSS animations, not transitions. Keep the nodes
+     mounted through exit while transitions allow interruption without a jump. */
+  animation: gc-drawer-exit-presence var(--gc-drawer-exit-duration);
+}
+@starting-style {
+  .gc-drawer[data-state="open"] {
+    transform: translate(var(--gc-drawer-offset-x), var(--gc-drawer-offset-y));
+  }
+  .gc-drawer-overlay[data-state="open"] {
+    opacity: 0;
+  }
+}
+@keyframes gc-drawer-exit-presence {
+  from,
+  to {
+    visibility: visible;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gc-drawer,
+  .gc-drawer-overlay {
+    transition: none !important;
+    animation: none !important;
+  }
+}
 .gc-drawer .gc-modal-body {
   flex: 1;
+  scrollbar-width: none;
+}
+.gc-drawer .gc-modal-body::-webkit-scrollbar {
+  display: none;
 }
 .gc-accordion {
   border: 1px solid var(--gc-border);
@@ -323,6 +371,8 @@
 }
 @media (max-width: 600px) {
   .gc-drawer {
+    --gc-drawer-offset-x: 0%;
+    --gc-drawer-offset-y: 100%;
     top: auto;
     bottom: 0;
     width: 100%;

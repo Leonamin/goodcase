@@ -55,9 +55,9 @@ lucide-react, radix-ui, react, react-dom
 ## 코드 위치
 
 - DialogProps: assets/src/components/overlays/dialog.tsx:5-17
-- Dialog: assets/src/components/overlays/dialog.tsx:107-109
-- Drawer: assets/src/components/overlays/dialog.tsx:110-112
-- DialogClose: assets/src/components/overlays/dialog.tsx:113-115
+- Dialog: assets/src/components/overlays/dialog.tsx:109-111
+- Drawer: assets/src/components/overlays/dialog.tsx:112-114
+- DialogClose: assets/src/components/overlays/dialog.tsx:115-117
 
 ## 이식
 
