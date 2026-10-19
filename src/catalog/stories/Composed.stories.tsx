@@ -44,3 +44,7 @@ export const AsyncContent: StoryObj = {
 export const CopyField: StoryObj = {
   render: () => renderExample("copy-field"),
 };
+
+export const ImageCropper: StoryObj = {
+  render: () => renderExample("image-cropper"),
+};
