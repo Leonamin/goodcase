@@ -538,3 +538,100 @@
     scale: 1;
   }
 }
+
+.gc-cropper {
+  --gc-crop-line: var(--gc-on-accent);
+  --gc-crop-grid: color-mix(in srgb, var(--gc-on-accent) 45%, transparent);
+  --gc-crop-shade: color-mix(in srgb, var(--gc-text) 55%, transparent);
+  width: 100%;
+  max-width: 760px;
+  margin-inline: auto;
+  display: grid;
+  gap: var(--gc-space-4);
+}
+.gc-cropper-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gc-space-2);
+}
+.gc-cropper-toolbar [aria-pressed="true"] {
+  color: var(--gc-accent);
+  border-color: var(--gc-accent);
+  background: var(--gc-accent-soft);
+}
+.gc-cropper-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 640 / 420;
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+  border-radius: var(--gc-radius);
+  background-color: var(--gc-surface);
+  background-image: conic-gradient(
+    var(--gc-border) 25%,
+    transparent 0 50%,
+    var(--gc-border) 0 75%,
+    transparent 0
+  );
+  background-size: 20px 20px;
+}
+.gc-cropper-stage:active {
+  cursor: grabbing;
+}
+.gc-cropper-stage canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.gc-cropper-stage .gc-cropper-handle {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  min-width: 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 2px solid var(--gc-crop-line);
+  border-radius: var(--gc-radius-sm);
+  cursor: nwse-resize;
+  touch-action: none;
+}
+.gc-cropper-settings {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  display: grid;
+  gap: var(--gc-space-4);
+}
+.gc-cropper-sliders {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gc-space-6);
+}
+.gc-cropper-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gc-space-4);
+  flex-wrap: wrap;
+}
+.gc-cropper-footer > div {
+  display: flex;
+  gap: var(--gc-space-2);
+  margin-left: auto;
+}
+.gc-cropper p {
+  margin: 0;
+}
+@media (max-width: 600px) {
+  .gc-cropper-sliders {
+    grid-template-columns: 1fr;
+    gap: var(--gc-space-4);
+  }
+  .gc-cropper-toolbar .gc-button {
+    flex: 1;
+  }
+}

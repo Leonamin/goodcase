@@ -516,6 +516,16 @@
     ]
   },
   {
+    "id": "image-cropper",
+    "name": "ImageCropper",
+    "category": "composed",
+    "summary": "움직이는 크롭 마스크와 사진 확대·회전, 투명 여백을 지원하는 사진 편집기",
+    "reference": "references/components/image-cropper.md",
+    "files": [
+      "assets/src/components/composed/image-cropper.tsx"
+    ]
+  },
+  {
     "id": "design-tokens",
     "name": "Design Tokens",
     "category": "foundation",

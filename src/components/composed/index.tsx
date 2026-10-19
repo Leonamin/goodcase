@@ -8,3 +8,4 @@ export * from "./file-uploader";
 export * from "./image-viewer";
 export * from "./image-gallery";
 export * from "./copy-field";
+export * from "./image-cropper";
