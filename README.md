@@ -42,14 +42,10 @@ Storybook은 별도 터미널에서 `pnpm storybook`을 실행한 뒤 [http://lo
 
 ## 스킬 설치
 
-대상 프로젝트 폴더에서 아래 출처 중 **하나**를 선택합니다.
+대상 프로젝트 폴더에서 아래 명령을 실행합니다.
 
 ```sh
-# Goodcase 저장소
 pnpm dlx skills add Leonamin/goodcase --skill use-goodcase-ui -a codex -y
-
-# 또는 중앙 스킬 저장소
-pnpm dlx skills add Leonamin/leonamin-skills --skill use-goodcase-ui -a codex -y
 ```
 
 Codex 프로젝트 스킬은 `.agents/skills/`에 설치됩니다. 모든 프로젝트에서 사용하려면 `-g`를 추가하고, Claude Code에는 `-a claude-code`를 사용합니다. 스킬을 읽는 새 Codex 세션에서 다음처럼 요청하세요.
@@ -65,7 +61,7 @@ $use-goodcase-ui로 설정 화면을 만들어줘.
 
 ## 스킬로 묶어서 배포하기
 
-Goodcase에서 원본을 관리하고 두 저장소에 같은 배포본을 반영합니다. 컴포넌트·스타일·카탈로그 또는 `skill-source/`의 지침을 수정한 뒤, Goodcase 루트에서 실행합니다.
+Goodcase에서 원본과 배포본을 함께 관리합니다. 컴포넌트·스타일·카탈로그 또는 `skill-source/`의 지침을 수정한 뒤, Goodcase 루트에서 실행합니다.
 
 ```sh
 pnpm build:skill
@@ -77,15 +73,9 @@ pnpm test:skill
 | `skills/use-goodcase-ui/`       | Goodcase 저장소에 커밋하는 설치용 스킬 |
 | `artifacts/use-goodcase-ui.zip` | 전체 스킬 폴더를 담은 수동 공유용 ZIP  |
 
-`leonamin-skills`에도 배포하려면 출력 경로를 지정합니다. 아래 경로는 중앙 저장소 또는 해당 워크트리의 실제 절대 경로로 바꾸세요.
+스킬은 이 저장소에서만 관리합니다. 컴포넌트나 토큰을 바꾸면 같은 PR에서 `skills/use-goodcase-ui/`를 다시 생성해 검토·커밋하고 기본 브랜치에 반영하면 위의 설치 명령으로 받을 수 있습니다. 생성된 파일은 직접 편집하지 않고 원본을 수정해 다시 생성합니다.
 
-```sh
-pnpm build:skill --output /absolute/path/to/leonamin-skills/use-goodcase-ui
-```
-
-각 저장소의 스킬 폴더를 검토·커밋하고 기본 브랜치에 반영하면 위의 설치 명령으로 받을 수 있습니다. 생성된 파일은 직접 편집하지 않고 원본을 수정해 다시 생성합니다.
-
-두 저장소와 사용자 설치본은 각각 갱신해야 합니다. 버전 관리, 배포본 비교, 두 저장소의 반영 범위, 수동 설치는 [스킬 배포 안내](docs/SKILL_BUNDLE.md)를 참고하세요.
+사용자 설치본은 자동 갱신되지 않으므로 별도로 갱신해야 합니다. 버전 관리, 배포본 확인, 수동 설치는 [스킬 배포 안내](docs/SKILL_BUNDLE.md)를 참고하세요.
 
 ## 개발
 
