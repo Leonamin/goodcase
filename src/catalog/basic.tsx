@@ -180,6 +180,25 @@ function SliderDemo() {
         description="방향키 또는 트랙을 눌러 조절합니다."
       />
       <B.Slider
+        label="두꺼운 트랙"
+        size="thick"
+        value={value}
+        onValueChange={setValue}
+        valueText={`${value}%`}
+      />
+      <B.Slider
+        label="두꺼운 트랙 · 단계 표시"
+        size="thick"
+        hasMarks
+        min={0}
+        max={100}
+        step={25}
+        value={Math.round(value / 25) * 25}
+        onValueChange={setValue}
+        valueText={`${Math.round(value / 25) * 25}%`}
+        description="25% 단위 5단계"
+      />
+      <B.Slider
         label="비활성 범위"
         value={60}
         onValueChange={() => {}}
@@ -731,12 +750,16 @@ export const basicEntries: CatalogEntry[] = [
       "label과 native range 입력을 연결하며 valueText를 보이는 현재 값과 aria-valuetext에 사용합니다.",
       "isDisabled는 포커스와 조작을 차단. description·error는 입력과 연결합니다.",
       "트랙·thumb·선택 구간은 --gc-* 토큰을 사용해 Blue·Forest·다크·밀도에 대응합니다.",
-      "포인터로 잡고 있는 동안 손잡이만 80ms로 1.2배 확대하고 놓으면 복귀합니다. 비활성·모션 감소 설정에서는 확대하지 않습니다.",
+      "포인터로 잡고 있는 동안 손잡이만 80ms로 1.2배 확대하고 놓으면 복귀합니다. 호버 시에는 1.1배로 살짝 커지며, hasMarks에서는 포인터와 가장 가까운 단계 점도 함께 커집니다. 비활성·모션 감소 설정에서는 확대하지 않습니다.",
+      "size=thick은 20px 트랙과 28px 흰색 손잡이입니다. hasMarks는 (max-min)/step 개의 단계에 점을 미리 표시합니다. 단계 수가 적을 때(약 10개 이하) 사용하고, 점은 트랙 배경으로 그려 손잡이 아래에 놓이며, 색은 CSS 변수 --gc-slider-mark-color로 바꿉니다.",
     ],
     states: [
       "기본",
       "최소·최대",
       "사용자 지정 범위·단위",
+      "호버",
+      "thick",
+      "thick + 단계 표시",
       "비활성",
       "키보드 포커스",
     ],
