@@ -73,6 +73,17 @@
   cursor: pointer;
   outline: none;
 }
+/* ponytail: (0,2,0) so global :focus-visible never wins regardless of CSS order */
+.gc-option:focus-visible {
+  outline: none;
+}
+@media (forced-colors: active) {
+  .gc-option[data-highlighted],
+  .gc-option.is-highlighted {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}
 .gc-option > span:first-child {
   min-width: 0;
   overflow-wrap: anywhere;
@@ -301,6 +312,9 @@
 }
 .gc-accordion h3 button[data-state="open"] svg {
   transform: rotate(180deg);
+}
+.gc-accordion h3 button:focus-visible {
+  outline-offset: -3px;
 }
 .gc-accordion h3 button:disabled {
   opacity: 0.4;
