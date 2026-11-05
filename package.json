@@ -12,7 +12,7 @@
     "build": "tsc -b && vite build",
     "build:skill": "node scripts/build-skill.mjs",
     "test:skill": "node --test scripts/build-skill.test.mjs",
-    "ui-check": "node tools/ui-check/check.mjs \"http://127.0.0.1:5179/?component=button\" --crawl \"aside a[href*=component=]\" --scope main",
+    "ui-check": "node skills/ui-check/check.mjs \"http://127.0.0.1:5179/?component=button\" --crawl \"aside a[href*=component=]\" --scope main",
     "test:ui-policy": "node --test scripts/component-usage.test.mjs",
     "typecheck": "tsc -b",
     "test": "playwright test",
