@@ -5,12 +5,16 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { RotateCcw, X, ZoomIn, ZoomOut } from "lucide-react";
 import { Dialog } from "../overlays/dialog";
-import { Button } from "../basic/button";
+import { Button, IconButton } from "../basic/button";
 import { GalleryImage } from "./gallery-image";
 import { useViewerGesture } from "./use-viewer-gesture";
 import { type ViewerImage } from "./viewer-image";
 export type { ViewerImage } from "./viewer-image";
+
+const viewerTitle = "이미지 보기";
+
 export function ImageViewer({
   images,
   index,
@@ -74,7 +78,7 @@ export function ImageViewer({
       trigger={trigger}
       isOpen={isOpen}
       onOpenChange={onOpenChange}
-      title="이미지 보기"
+      title={viewerTitle}
       description={current?.alt || "이미지 없음"}
       initialFocusRef={closeRef}
       className="gc-viewer-dialog"
@@ -83,43 +87,49 @@ export function ImageViewer({
         className="gc-viewer"
         {...viewerProps}
         data-animated={shouldAnimate}
+        data-single-image={images.length === 1 || undefined}
         data-viewer-blank
       >
         <div className="gc-viewer-toolbar">
-          <span className="gc-viewer-counter" aria-live="polite">
-            {current ? index + 1 : 0} / {images.length}
+          <span className="gc-viewer-title" aria-hidden="true">
+            {viewerTitle}
           </span>
           <div className="gc-viewer-tools">
-            <Button
-              variant="secondary"
+            <IconButton
+              appearance="ghost"
+              label="축소"
               disabled={zoom <= 1 || state !== "success"}
-              aria-label="축소"
               onClick={() => changeZoom(zoom - 0.5)}
             >
-              −
-            </Button>
+              <ZoomOut aria-hidden="true" focusable="false" />
+            </IconButton>
             <span className="gc-viewer-zoom">{Math.round(zoom * 100)}%</span>
-            <Button
-              variant="secondary"
+            <IconButton
+              appearance="ghost"
+              label="확대"
               disabled={zoom >= 4 || state !== "success"}
-              aria-label="확대"
               onClick={() => changeZoom(zoom + 0.5)}
             >
-              +
-            </Button>
-            <Button variant="secondary" onClick={() => changeZoom(1)}>
-              초기화
-            </Button>
-            <span className="gc-viewer-toolbar-divider" />
-            <Button
+              <ZoomIn aria-hidden="true" focusable="false" />
+            </IconButton>
+            <IconButton
+              appearance="ghost"
+              label="초기화"
+              onClick={() => changeZoom(1)}
+            >
+              <RotateCcw aria-hidden="true" focusable="false" />
+            </IconButton>
+            <span className="gc-viewer-counter" aria-live="polite">
+              {current ? index + 1 : 0} / {images.length}
+            </span>
+            <IconButton
               ref={closeRef}
-              variant="secondary"
-              className="gc-viewer-close"
-              aria-label="닫기"
+              appearance="ghost"
+              label="닫기"
               onClick={() => onOpenChange(false)}
             >
-              ×
-            </Button>
+              <X aria-hidden="true" focusable="false" />
+            </IconButton>
           </div>
         </div>
         <div
@@ -196,24 +206,28 @@ export function ImageViewer({
               </div>
             )}
           </div>
-          <Button
-            variant="secondary"
-            className="gc-viewer-nav gc-viewer-nav-previous"
-            aria-label="← 이전"
-            disabled={index <= 0 || !current}
-            onClick={() => onIndexChange(index - 1)}
-          >
-            ‹
-          </Button>
-          <Button
-            variant="secondary"
-            className="gc-viewer-nav gc-viewer-nav-next"
-            aria-label="다음 →"
-            disabled={!current || index >= images.length - 1}
-            onClick={() => onIndexChange(index + 1)}
-          >
-            ›
-          </Button>
+          {images.length > 1 && (
+            <>
+              <Button
+                variant="secondary"
+                className="gc-viewer-nav gc-viewer-nav-previous"
+                aria-label="← 이전"
+                disabled={index <= 0 || !current}
+                onClick={() => onIndexChange(index - 1)}
+              >
+                ‹
+              </Button>
+              <Button
+                variant="secondary"
+                className="gc-viewer-nav gc-viewer-nav-next"
+                aria-label="다음 →"
+                disabled={!current || index >= images.length - 1}
+                onClick={() => onIndexChange(index + 1)}
+              >
+                ›
+              </Button>
+            </>
+          )}
         </div>
         <div className="gc-viewer-caption" data-viewer-blank>
           <p>{current?.alt || "이미지 없음"}</p>

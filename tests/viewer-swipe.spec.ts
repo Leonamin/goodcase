@@ -29,6 +29,60 @@ async function setup(page: Page) {
     session: await page.context().newCDPSession(page),
   };
 }
+
+for (const viewport of [
+  { width: 1440, height: 900 },
+  { width: 390, height: 844 },
+]) {
+  test(`gallery ghost toolbar preserves zoom, swipe and focus at ${viewport.width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(viewport);
+    await page.goto("/?component=image-gallery");
+    const thumbnail = page.locator(".gc-gallery-item").first();
+    const dialog = page.getByRole("dialog", { name: "이미지 보기" });
+    const zoomIn = dialog.getByRole("button", { name: "확대", exact: true });
+    const zoomOut = dialog.getByRole("button", { name: "축소", exact: true });
+    const reset = dialog.getByRole("button", { name: "초기화", exact: true });
+    const close = dialog.getByRole("button", { name: "닫기", exact: true });
+    const zoom = dialog.locator(".gc-viewer-zoom");
+
+    await thumbnail.tap();
+    await expect(zoomIn).toBeEnabled();
+    await expect(close).toBeFocused();
+    for (const button of [zoomIn, zoomOut, reset, close]) {
+      await expect(button).toHaveClass(/\bgc-icon-button-ghost\b/);
+      await expect(button).toHaveCSS("width", "40px");
+      await expect(button).toHaveCSS("height", "40px");
+      await expect(button).toHaveCSS("border-top-color", "rgba(0, 0, 0, 0)");
+    }
+    await zoomIn.tap();
+    await expect(zoom).toHaveText("150%");
+    await zoomOut.tap();
+    await expect(zoom).toHaveText("100%");
+    await zoomIn.tap();
+    await reset.tap();
+    await expect(zoom).toHaveText("100%");
+
+    const image = await dialog
+      .locator(".gc-viewer-image-current img")
+      .boundingBox();
+    if (!image) throw new Error("Gallery image missing");
+    const x = image.x + image.width * 0.65;
+    const y = image.y + image.height / 2;
+    const session = await page.context().newCDPSession(page);
+    await touch(session, "touchStart", x, y);
+    await touch(session, "touchMove", x - 65, y);
+    await touch(session, "touchMove", x - 145, y);
+    await touch(session, "touchEnd");
+    await expect(dialog.locator(".gc-viewer-counter")).toHaveText("2 / 3");
+
+    await close.tap();
+    await expect(dialog).toHaveCount(0);
+    await expect(thumbnail).toBeFocused();
+  });
+}
+
 test("real touch follows finger with adjacent page and commits left/right without closing", async ({
   page,
 }) => {

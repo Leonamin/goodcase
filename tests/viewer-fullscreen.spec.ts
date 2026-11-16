@@ -18,7 +18,7 @@ test("fullscreen dark viewer preserves image/control actions, pan, background cl
   expect(geometry.rect.y).toBe(0);
   expect(geometry.rect.width).toBe(1440);
   expect(geometry.rect.height).toBe(1000);
-  expect(geometry.background).toBe("rgb(16, 17, 21)");
+  expect(geometry.background).toBe("rgb(8, 8, 9)");
   const image = dialog.locator(".gc-viewer-image-current img");
   await expect(
     dialog.getByRole("button", { name: "확대", exact: true }),
