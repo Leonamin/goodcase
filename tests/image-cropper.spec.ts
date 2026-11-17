@@ -349,3 +349,187 @@ test("saving ends an active drag and blocks pointer movement until a new gesture
   expect(await pixels()).toBe(before);
   await page.mouse.up();
 });
+
+test("wheel small deltas snap at 100% then accumulate to escape without page scroll", async ({
+  page,
+}) => {
+  await load(page);
+  const stage = page.getByRole("group", {
+    name: "크롭 편집 영역",
+    exact: true,
+  });
+  await stage.scrollIntoViewIfNeeded();
+  const box = (await stage.boundingBox())!;
+  await page.mouse.move(box.x + box.width * 0.6, box.y + box.height * 0.4);
+  const scrollY = await page.evaluate(() => window.scrollY);
+  const zoom = page.getByRole("slider", { name: "확대·축소", exact: true });
+  await page.mouse.wheel(0, -5);
+  await expect(zoom).toHaveAttribute("aria-valuetext", "100%");
+  await expect(page.getByLabel("스냅 가이드")).toContainText("100% 배율 맞춤");
+  for (let i = 0; i < 3; i++) await page.mouse.wheel(0, -5);
+  await expect(zoom).toHaveAttribute("aria-valuetext", "100%");
+  await page.mouse.wheel(0, -5);
+  await expect(zoom).toHaveAttribute("aria-valuetext", "105%");
+  await expect(page.getByLabel("스냅 가이드")).toHaveCount(0);
+  expect(await page.evaluate(() => window.scrollY)).toBe(scrollY);
+});
+
+test("sliders latch with wider release threshold and support Alt and toggle bypass", async ({
+  page,
+}) => {
+  await load(page);
+  const zoom = page.getByRole("slider", { name: "확대·축소", exact: true });
+  const rotation = page.getByRole("slider", { name: "회전", exact: true });
+  for (const [raw, label] of [
+    ["0.49", "50%"],
+    ["0.52", "50%"],
+    ["0.53", "53%"],
+    ["1.98", "200%"],
+    ["2.08", "200%"],
+    ["2.11", "211%"],
+  ]) {
+    await zoom.fill(raw);
+    await expect(zoom).toHaveAttribute("aria-valuetext", label);
+  }
+  for (const [raw, label] of [
+    ["88", "90°"],
+    ["86", "90°"],
+    ["84", "84°"],
+    ["-178", "-180°"],
+    ["179", "180°"],
+  ]) {
+    await rotation.fill(raw);
+    await expect(rotation).toHaveAttribute("aria-valuetext", label);
+  }
+  await page.keyboard.down("Alt");
+  await zoom.fill("0.99");
+  await rotation.fill("89");
+  await expect(zoom).toHaveAttribute("aria-valuetext", "99%");
+  await expect(rotation).toHaveAttribute("aria-valuetext", "89°");
+  await expect(page.getByLabel("스냅 가이드")).toHaveCount(0);
+  await page.keyboard.up("Alt");
+  await rotation.fill("88");
+  await expect(rotation).toHaveAttribute("aria-valuetext", "90°");
+  await page.getByRole("checkbox", { name: "스냅", exact: true }).uncheck();
+  await zoom.fill("0.99");
+  await rotation.fill("89");
+  await expect(zoom).toHaveAttribute("aria-valuetext", "99%");
+  await expect(rotation).toHaveAttribute("aria-valuetext", "89°");
+  await expect(page.getByLabel("스냅 가이드")).toHaveCount(0);
+});
+
+test("keyboard rotation can leave zero snap; guide is excluded from PNG", async ({
+  page,
+}) => {
+  await load(page);
+  const rotation = page.getByRole("slider", { name: "회전", exact: true });
+  await rotation.focus();
+  for (let i = 0; i < 5; i++) await page.keyboard.press("ArrowRight");
+  await expect(rotation).toHaveAttribute("aria-valuetext", "0°");
+  await page.keyboard.press("ArrowRight");
+  await expect(rotation).toHaveAttribute("aria-valuetext", "6°");
+  await rotation.fill("88");
+  await expect(page.locator(".gc-cropper-guides")).toBeVisible();
+  const snapped = await exportPixels(page);
+  await page.getByRole("checkbox", { name: "스냅", exact: true }).uncheck();
+  const withoutGuide = await exportPixels(page);
+  expect(withoutGuide).toEqual(snapped);
+});
+
+test.describe("mobile snap gestures", () => {
+  test.use({ hasTouch: true, isMobile: true });
+  test("mobile pinch and rotation snap independently, release smoothly, and reset", async ({
+    page,
+    context,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await load(page);
+    const stage = page.getByRole("group", {
+      name: "크롭 편집 영역",
+      exact: true,
+    });
+    await stage.scrollIntoViewIfNeeded();
+    const box = (await stage.boundingBox())!,
+      cx = box.x + box.width / 2,
+      cy = box.y + box.height / 2;
+    const cdp = await context.newCDPSession(page);
+    const points = (ratio: number, angle: number) => {
+      const r = 40 * ratio,
+        rad = (angle * Math.PI) / 180;
+      return [
+        { x: cx - r * Math.cos(rad), y: cy - r * Math.sin(rad), id: 1 },
+        { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad), id: 2 },
+      ];
+    };
+    const move = async (ratio: number, angle: number) => {
+      await cdp.send("Input.dispatchTouchEvent", {
+        type: "touchMove",
+        touchPoints: points(ratio, angle),
+      });
+    };
+    const zoom = page.getByRole("slider", { name: "확대·축소", exact: true }),
+      rotation = page.getByRole("slider", { name: "회전", exact: true });
+    await cdp.send("Input.dispatchTouchEvent", {
+      type: "touchStart",
+      touchPoints: points(1, 0),
+    });
+    await move(1.02, 88);
+    await expect(zoom).toHaveAttribute("aria-valuetext", "100%");
+    await expect(rotation).toHaveAttribute("aria-valuetext", "90°");
+    await move(1.04, 86);
+    await expect(zoom).toHaveAttribute("aria-valuetext", "100%");
+    await expect(rotation).toHaveAttribute("aria-valuetext", "90°");
+    await page.screenshot({
+      path: "test-results/image-cropper-snap-mobile.png",
+      fullPage: false,
+    });
+    await move(1.07, 86);
+    await expect
+      .poll(() => zoom.getAttribute("aria-valuetext"))
+      .not.toBe("100%");
+    await expect(rotation).toHaveAttribute("aria-valuetext", "90°");
+    await move(1.07, 83);
+    await expect
+      .poll(() => rotation.getAttribute("aria-valuetext"))
+      .not.toBe("90°");
+    await cdp.send("Input.dispatchTouchEvent", {
+      type: "touchEnd",
+      touchPoints: [],
+    });
+    await page.getByRole("checkbox", { name: "스냅", exact: true }).tap();
+    await expect(
+      page.getByRole("checkbox", { name: "스냅", exact: true }),
+    ).not.toBeChecked();
+    await page.getByRole("button", { name: "100% 배율", exact: true }).tap();
+    await stage.scrollIntoViewIfNeeded();
+    const nextBox = (await stage.boundingBox())!;
+    const beforeDrag = await stage
+      .locator("canvas")
+      .evaluate((node) => (node as HTMLCanvasElement).toDataURL());
+    // Single touch still moves the image after two-finger release.
+    await cdp.send("Input.dispatchTouchEvent", {
+      type: "touchStart",
+      touchPoints: [{ x: nextBox.x + 100, y: nextBox.y + 100, id: 1 }],
+    });
+    await cdp.send("Input.dispatchTouchEvent", {
+      type: "touchMove",
+      touchPoints: [{ x: nextBox.x + 120, y: nextBox.y + 110, id: 1 }],
+    });
+    await cdp.send("Input.dispatchTouchEvent", {
+      type: "touchEnd",
+      touchPoints: [],
+    });
+    await page
+      .getByRole("button", { name: "초기화", exact: true })
+      .last()
+      .click();
+    await expect(zoom).toHaveValue("1");
+    await expect(rotation).toHaveValue("0");
+    await expect(page.getByLabel("스냅 가이드")).toHaveCount(0);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+  });
+});

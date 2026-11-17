@@ -1,6 +1,12 @@
 import { useEffect, useId, useRef, useState, type PointerEvent } from "react";
 import { Button } from "../basic/button";
 import { Slider } from "../basic/slider";
+import { Checkbox } from "../basic/checkbox";
+import {
+  cropSnapTarget,
+  cropZoomStops,
+  cropRotationStops,
+} from "./image-cropper-snap";
 
 export type CropShape = "rectangle" | "rounded" | "circle";
 export type CropResult = { blob: Blob; width: number; height: number };
@@ -78,7 +84,74 @@ export function ImageCropper({
 }: ImageCropperProps) {
   const [shape, setShape] = useState<CropShape>(initialShape);
   const [frame, setFrame] = useState(initialFrame);
-  const [transform, setTransform] = useState(initialTransform);
+  const [transform, storeTransform] = useState(initialTransform);
+  const transformRef = useRef(initialTransform);
+  const [isSnapEnabled, setIsSnapEnabled] = useState(true);
+  const isAltPressedRef = useRef(false);
+  // Sliders and wheel accumulation retain raw values so a snapped result cannot
+  // trap later small inputs at a stop (including keyboard range increments).
+  const [rawValues, setRawValues] = useState({ zoom: 1, rotation: 0 });
+  const rawValuesRef = useRef({ zoom: 1, rotation: 0 });
+  const emptySnap = { zoom: null, rotation: null };
+  const [snap, setSnap] = useState<{
+    zoom: number | null;
+    rotation: number | null;
+  }>(emptySnap);
+  const snapRef = useRef(snap);
+  function setTransform(
+    value: Transform | ((current: Transform) => Transform),
+  ) {
+    const next =
+      typeof value === "function" ? value(transformRef.current) : value;
+    transformRef.current = next;
+    storeTransform(next);
+  }
+  function clearSnaps() {
+    snapRef.current = emptySnap;
+    setSnap(emptySnap);
+  }
+  function resolveValue(
+    axis: "zoom" | "rotation",
+    raw: number,
+    shouldBypass = false,
+  ) {
+    rawValuesRef.current = { ...rawValuesRef.current, [axis]: raw };
+    setRawValues(rawValuesRef.current);
+    const target =
+      isSnapEnabled && !isAltPressedRef.current && !shouldBypass
+        ? cropSnapTarget(
+            raw,
+            axis === "zoom" ? cropZoomStops : cropRotationStops,
+            snapRef.current[axis],
+            axis === "zoom",
+          )
+        : null;
+    snapRef.current = { ...snapRef.current, [axis]: target };
+    setSnap(snapRef.current);
+    return target ?? raw;
+  }
+  function applyZoom(
+    raw: number,
+    anchor = { x: transformRef.current.x, y: transformRef.current.y },
+    shouldBypass = false,
+  ) {
+    const zoom = resolveValue("zoom", raw, shouldBypass);
+    setTransform((current) => {
+      const scale = zoom / current.zoom;
+      return {
+        ...current,
+        zoom,
+        x: anchor.x + (current.x - anchor.x) * scale,
+        y: anchor.y + (current.y - anchor.y) * scale,
+      };
+    });
+  }
+  function resetTransform() {
+    setTransform(initialTransform);
+    rawValuesRef.current = { zoom: 1, rotation: 0 };
+    setRawValues(rawValuesRef.current);
+    clearSnaps();
+  }
   const [mode, setMode] = useState<"image" | "mask">("image");
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [error, setError] = useState("");
@@ -98,7 +171,7 @@ export function ImageCropper({
     let isCurrent = true;
     setImage(null);
     setError("");
-    setTransform(initialTransform);
+    resetTransform();
     setFrame(initialFrame);
     const next = new Image();
     next.crossOrigin = "anonymous";
@@ -118,6 +191,28 @@ export function ImageCropper({
       gesture.current = null;
     };
   }, [src]);
+  useEffect(() => {
+    function keyDown(event: KeyboardEvent) {
+      if (event.key === "Alt") {
+        isAltPressedRef.current = true;
+        clearSnaps();
+      }
+    }
+    function keyUp(event: KeyboardEvent) {
+      if (event.key === "Alt") isAltPressedRef.current = false;
+    }
+    function blur() {
+      isAltPressedRef.current = false;
+    }
+    window.addEventListener("keydown", keyDown);
+    window.addEventListener("keyup", keyUp);
+    window.addEventListener("blur", blur);
+    return () => {
+      window.removeEventListener("keydown", keyDown);
+      window.removeEventListener("keyup", keyUp);
+      window.removeEventListener("blur", blur);
+    };
+  }, []);
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -179,20 +274,15 @@ export function ImageCropper({
       const unit =
         event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? rect.height : 1;
       const factor = Math.exp(-clamp(event.deltaY * unit, -500, 500) * 0.002);
-      setTransform((current) => {
-        const zoom = clamp(current.zoom * factor, 0.1, 8);
-        const scale = zoom / current.zoom;
-        return {
-          ...current,
-          zoom,
-          x: point.x + (current.x - point.x) * scale,
-          y: point.y + (current.y - point.y) * scale,
-        };
-      });
+      applyZoom(
+        clamp(rawValuesRef.current.zoom * factor, 0.1, 8),
+        point,
+        event.altKey,
+      );
     }
     stage.addEventListener("wheel", wheel, { passive: false });
     return () => stage.removeEventListener("wheel", wheel);
-  }, [image]);
+  }, [image, isSnapEnabled]);
   function localPoint(event: PointerEvent) {
     const rect = stageRef.current!.getBoundingClientRect();
     return {
@@ -203,7 +293,7 @@ export function ImageCropper({
   function rebase(action = gesture.current?.action ?? "image") {
     gesture.current = {
       points: [...pointers.current.values()],
-      transform: { ...transform },
+      transform: { ...transformRef.current },
       frame: { ...frame },
       action,
     };
@@ -238,10 +328,14 @@ export function ImageCropper({
         [c, d] = current;
       const distance = Math.hypot(b.x - a.x, b.y - a.y);
       if (distance < 5) return;
-      const zoom = clamp(
-        (start.transform.zoom * Math.hypot(d.x - c.x, d.y - c.y)) / distance,
-        0.1,
-        8,
+      const zoom = resolveValue(
+        "zoom",
+        clamp(
+          (start.transform.zoom * Math.hypot(d.x - c.x, d.y - c.y)) / distance,
+          0.1,
+          8,
+        ),
+        event.altKey,
       );
       const delta = Math.atan2(
         Math.sin(
@@ -256,18 +350,28 @@ export function ImageCropper({
         x: start.transform.x - mid.x,
         y: start.transform.y - mid.y,
       };
+      const rotation = resolveValue(
+        "rotation",
+        ((start.transform.rotation + (delta * 180) / Math.PI + 540) % 360) -
+          180,
+        event.altKey,
+      );
+      const appliedDelta =
+        ((rotation - start.transform.rotation) * Math.PI) / 180;
       const scale = zoom / start.transform.zoom;
       setTransform({
         x:
           (c.x + d.x) / 2 +
-          scale * (offset.x * Math.cos(delta) - offset.y * Math.sin(delta)),
+          scale *
+            (offset.x * Math.cos(appliedDelta) -
+              offset.y * Math.sin(appliedDelta)),
         y:
           (c.y + d.y) / 2 +
-          scale * (offset.x * Math.sin(delta) + offset.y * Math.cos(delta)),
+          scale *
+            (offset.x * Math.sin(appliedDelta) +
+              offset.y * Math.cos(appliedDelta)),
         zoom,
-        rotation:
-          ((start.transform.rotation + (delta * 180) / Math.PI + 540) % 360) -
-          180,
+        rotation,
       });
       return;
     }
@@ -416,6 +520,38 @@ export function ImageCropper({
         }}
       >
         <canvas ref={canvasRef} width={W} height={H} aria-hidden="true" />
+        {image && snap.rotation !== null && (
+          <svg
+            className="gc-cropper-guides"
+            viewBox={`0 0 ${W} ${H}`}
+            aria-hidden="true"
+          >
+            <line
+              x1="0"
+              x2={W}
+              y1={frame.y + frame.height / 2}
+              y2={frame.y + frame.height / 2}
+            />
+            <line
+              y1="0"
+              y2={H}
+              x1={frame.x + frame.width / 2}
+              x2={frame.x + frame.width / 2}
+            />
+          </svg>
+        )}
+        {image && (snap.zoom !== null || snap.rotation !== null) && (
+          <div
+            className="gc-cropper-snap-status"
+            role="status"
+            aria-label="스냅 가이드"
+          >
+            {snap.zoom !== null && (
+              <span>{Math.round(snap.zoom * 100)}% 배율 맞춤</span>
+            )}
+            {snap.rotation !== null && <span>{snap.rotation}° 회전 맞춤</span>}
+          </div>
+        )}
         {image && mode === "mask" && (
           <Button
             className="gc-cropper-handle"
@@ -480,34 +616,104 @@ export function ImageCropper({
           <Button
             variant="secondary"
             onClick={() => {
-              setTransform(initialTransform);
+              resetTransform();
               setFrame(initialFrame);
             }}
           >
             초기화
           </Button>
         </div>
+        <div className="gc-cropper-snap-settings">
+          <Checkbox
+            label="스냅"
+            isChecked={isSnapEnabled}
+            onCheckedChange={(isEnabled) => {
+              setIsSnapEnabled(isEnabled);
+              clearSnaps();
+              rawValuesRef.current = {
+                zoom: transformRef.current.zoom,
+                rotation: transformRef.current.rotation,
+              };
+              setRawValues(rawValuesRef.current);
+            }}
+          />
+          <span className="gc-help">
+            PC에서 Alt를 누르면 잠시 해제 · 100%는 처음 화면에 맞춘 크기
+          </span>
+        </div>
         <div className="gc-cropper-sliders">
-          <Slider
-            label="확대·축소"
-            min={0.1}
-            max={8}
-            step={0.01}
-            value={transform.zoom}
-            valueText={`${Math.round(transform.zoom * 100)}%`}
-            onValueChange={(zoom) => setTransform((t) => ({ ...t, zoom }))}
-          />
-          <Slider
-            label="회전"
-            min={-180}
-            max={180}
-            step={1}
-            value={transform.rotation}
-            valueText={`${Math.round(transform.rotation)}°`}
-            onValueChange={(rotation) =>
-              setTransform((t) => ({ ...t, rotation }))
-            }
-          />
+          <div
+            className="gc-cropper-axis"
+            data-snapped={snap.zoom !== null || undefined}
+          >
+            <Slider
+              label="확대·축소"
+              min={0.1}
+              max={8}
+              step={0.01}
+              value={rawValues.zoom}
+              valueText={`${Math.round(transform.zoom * 100)}%`}
+              onValueChange={(zoom) => applyZoom(zoom)}
+            />
+            <div
+              className="gc-cropper-stops"
+              role="group"
+              aria-label="기준 배율"
+            >
+              {cropZoomStops.map((zoom) => (
+                <Button
+                  key={zoom}
+                  variant="secondary"
+                  aria-label={`${zoom * 100}% 배율`}
+                  aria-pressed={transform.zoom === zoom}
+                  onClick={() => applyZoom(zoom)}
+                >
+                  {zoom * 100}%
+                </Button>
+              ))}
+            </div>
+          </div>
+          <div
+            className="gc-cropper-axis"
+            data-snapped={snap.rotation !== null || undefined}
+          >
+            <Slider
+              label="회전"
+              min={-180}
+              max={180}
+              step={1}
+              value={rawValues.rotation}
+              valueText={`${Math.round(transform.rotation)}°`}
+              onValueChange={(rotation) =>
+                setTransform((t) => ({
+                  ...t,
+                  rotation: resolveValue("rotation", rotation),
+                }))
+              }
+            />
+            <div
+              className="gc-cropper-stops"
+              role="group"
+              aria-label="기준 회전각"
+            >
+              {cropRotationStops.map((rotation) => (
+                <Button
+                  key={rotation}
+                  variant="secondary"
+                  aria-label={`${rotation}° 회전`}
+                  aria-pressed={transform.rotation === rotation}
+                  onClick={() =>
+                    setTransform((t) => ({
+                      ...t,
+                      rotation: resolveValue("rotation", rotation),
+                    }))
+                  }
+                >
+                  {rotation}°
+                </Button>
+              ))}
+            </div>
+          </div>
         </div>
       </fieldset>
       <div className="gc-cropper-footer">
